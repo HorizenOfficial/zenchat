@@ -1,13 +1,24 @@
-import '../assets/css/App.css';
 import React, { Component } from 'react';
+import { Grid, Row, Col } from 'react-flexbox-grid';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import ChatList from './ChatList'
+import ChatContent from './ChatContent'
 
 class App extends React.Component {
   render() {
     return (
-      <div>
-        <h1>Hello, Electron!</h1>
-        <p>I hope you enjoy using basic-electron-react-boilerplate to start your dev off right! kek lamo</p>
-      </div>
+      <MuiThemeProvider>
+        <Grid fluid style={{padding: '0px', margin: '0px'}}>
+          <Row style={{height: '98vh', flexWrap: 'nowrap'}}>
+            <Col md={4} style={{borderRight: '1px solid #ddd', padding: '0px'}}>            
+              <ChatList/>             
+            </Col>
+            <Col md={8} style={{padding: '0px'}}>
+              <ChatContent/>
+            </Col>
+          </Row>
+        </Grid>
+      </MuiThemeProvider>
     );
   }
 }

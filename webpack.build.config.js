@@ -19,29 +19,13 @@ module.exports = {
     filename: 'bundle.js'
   },
   module: {
-    rules: [
+    loaders: [
+      { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
+      { test: /\.jsx$/, loader: 'babel-loader', exclude: /node_modules/ },
+      { test: /\.css$/, loader: 'style-loader!css-loader?modules', include: /flexboxgrid/},
       {
-        test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: 'css-loader'
-        }),
-        include: defaultInclude
-      },
-      {
-        test: /\.jsx?$/,
-        use: [{ loader: 'babel-loader' }],
-        include: defaultInclude
-      },
-      {
-        test: /\.(jpe?g|png|gif)$/,
-        use: [{ loader: 'file-loader?name=img/[name]__[hash:base64:5].[ext]' }],
-        include: defaultInclude
-      },
-      {
-        test: /\.(eot|svg|ttf|woff|woff2)$/,
-        use: [{ loader: 'file-loader?name=font/[name]__[hash:base64:5].[ext]' }],
-        include: defaultInclude
+          test: /\.jpe?g$|\.ico$|\.gif$|\.png$|\.svg$|\.woff$|\.ttf$|\.wav$|\.mp3$/,
+          loader: 'file-loader?name=[name].[ext]'  // <-- retain original file name
       }
     ]
   },
