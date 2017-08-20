@@ -1,8 +1,10 @@
+import { iconStyle } from './Styles';
 import React, { Component } from 'react';
 
 import {List, ListItem} from 'material-ui/List';
 import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
 import Avatar from 'material-ui/Avatar';
+import Dialog from 'material-ui/Dialog';
 import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
@@ -18,21 +20,6 @@ import CommunicationChatBubble from 'material-ui/svg-icons/communication/chat-bu
 import SettingsIconAsset from 'material-ui/svg-icons/action/settings-applications';
 import {red500, yellow500, blue500} from 'material-ui/styles/colors';
 
-// Styles
-const styles = {
-  smallIcon: {
-    width: 24,
-    height: 24,
-  },
-  mediumIcon: {
-    width: 32,
-    height: 32,
-  },
-  largeIcon: {
-    width: 60,
-    height: 60,
-  },
-};
 
 // Icon buttons
 const iconButtonElement = (
@@ -52,6 +39,57 @@ const rightIconMenu = (
   </IconMenu>
 );
 
+// Dialog
+class SetSettingsDialog extends React.Component {
+  constructor(props){
+    super(props)
+
+    this.handleDialogOpen = this.handleDialogOpen.bind(this)
+    this.handleDialogClose = this.handleDialogClose.bind(this)
+    this.state = {
+      dialogOpen: false
+    }
+  }
+
+  handleDialogOpen(){
+    this.setState({
+      dialogOpen: true
+    })
+  }
+
+  handleDialogClose(){
+    this.setState({
+      dialogOpen: true
+    })
+  }
+
+  render() {
+    const actions = [
+      <FlatButton
+        label="Ok"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose}
+      />,
+    ];
+
+    return (
+      <div>
+        <RaisedButton label="Dialog With Date Picker" onClick={this.handleOpen} />
+        <Dialog
+          title="Dialog With Date Picker"
+          actions={actions}
+          modal={false}
+          open={this.state.open}
+          onRequestClose={this.handleClose}
+        >
+          Open a Date Picker dialog from within a dialog.          
+        </Dialog>
+      </div>
+    );
+  }
+}
+
 
 class ChatList extends React.Component {
   render() {
@@ -61,12 +99,12 @@ class ChatList extends React.Component {
           <div style={{textAlign: 'right'}}>            
             <IconButton
               tooltip="new room"
-              iconStyle={styles.smallIcon}>              
+              iconStyle={iconStyle.smallIcon}>              
               <CommunicationChatBubble color={grey400}/>
             </IconButton>
             <IconButton
               tooltip="settings"
-              iconStyle={styles.smallIcon}>
+              iconStyle={iconStyle.smallIcon}>
               <SettingsIconAsset color={grey400}/>
             </IconButton>            
           </div>
