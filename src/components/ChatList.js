@@ -1,17 +1,22 @@
 import React, { Component } from 'react';
 
-import Paper from 'material-ui/Paper';
 import {List, ListItem} from 'material-ui/List';
-import Divider from 'material-ui/Divider';
-import Subheader from 'material-ui/Subheader';
-import Avatar from 'material-ui/Avatar';
 import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
-import IconButton from 'material-ui/IconButton';
+import Avatar from 'material-ui/Avatar';
+import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
+import Paper from 'material-ui/Paper';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import MenuItem from 'material-ui/MenuItem';
+import RaisedButton from 'material-ui/RaisedButton';
+import Subheader from 'material-ui/Subheader';
 import TextField from 'material-ui/TextField';
+
+import CommunicationChatBubble from 'material-ui/svg-icons/communication/chat-bubble';
+import SettingsIconAsset from 'material-ui/svg-icons/action/settings-applications';
+import {red500, yellow500, blue500} from 'material-ui/styles/colors';
 
 const iconButtonElement = (
   <IconButton
@@ -23,15 +28,64 @@ const iconButtonElement = (
   </IconButton>
 );
 
+const rightIconMenu = (
+  <IconMenu iconButtonElement={iconButtonElement}>
+    <MenuItem>Rename Room</MenuItem>
+    <MenuItem>Get Room Code</MenuItem>
+  </IconMenu>
+);
+
+const styles = {
+  smallIcon: {
+    width: 24,
+    height: 24,
+  },
+  mediumIcon: {
+    width: 32,
+    height: 32,
+  },
+  largeIcon: {
+    width: 60,
+    height: 60,
+  },
+  small: {
+    width: 72,
+    height: 72,
+    padding: 16,
+  },
+  medium: {
+    width: 96,
+    height: 96,
+    padding: 24,
+  },
+  large: {
+    width: 120,
+    height: 120,
+    padding: 30,
+  },
+};
 
 class ChatList extends React.Component {
   render() {
     return (
       <div style={{height: '100%', overflowY: 'auto'}}>
-        <Subheader style={{padding: '0px'}}>
-          <FlatButton label="settings" fullWidth={true} />
-        </Subheader>
+        <ListItem disabled={true} style={{padding: '0px'}}>          
+          <div style={{textAlign: 'right'}}>            
+            <IconButton
+              tooltip="new room"
+              iconStyle={styles.smallIcon}>              
+              <CommunicationChatBubble color={grey400}/>
+            </IconButton>
+            <IconButton
+              tooltip="settings"
+              iconStyle={styles.smallIcon}>
+              <SettingsIconAsset color={grey400}/>
+            </IconButton>            
+          </div>
+        </ListItem>
+
         <Divider/>
+
         <List>          
           <ListItem                                    
             secondaryText={
@@ -41,6 +95,7 @@ class ChatList extends React.Component {
               </p>
             }
             secondaryTextLines={2}
+            rightIconButton={rightIconMenu}
           />
           <Divider/>
           <ListItem                                    
@@ -51,6 +106,7 @@ class ChatList extends React.Component {
               </p>
             }
             secondaryTextLines={2}
+            rightIconButton={rightIconMenu}
           />
           <Divider/>
           <ListItem                        
@@ -61,6 +117,7 @@ class ChatList extends React.Component {
               </p>
             }
             secondaryTextLines={2}
+            rightIconButton={rightIconMenu}
           />
           <Divider />
           <ListItem                                    
@@ -71,6 +128,7 @@ class ChatList extends React.Component {
               </p>
             }
             secondaryTextLines={2}
+            rightIconButton={rightIconMenu}
           />
           <Divider />
           <ListItem
@@ -81,6 +139,7 @@ class ChatList extends React.Component {
               </p>
             }
             secondaryTextLines={2}
+            rightIconButton={rightIconMenu}
           />           
         </List>                      
     </div>

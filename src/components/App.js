@@ -10,10 +10,10 @@ class App extends React.Component {
       <MuiThemeProvider>
         <Grid fluid style={{padding: '0px', margin: '0px'}}>
           <Row style={{height: '98vh', flexWrap: 'nowrap'}}>
-            <Col md={4} style={{borderRight: '1px solid #ddd', padding: '0px'}}>            
+            <Col xs={4} style={{borderRight: '1px solid #ddd', padding: '0px'}}>            
               <ChatList/>             
             </Col>
-            <Col md={8} style={{padding: '0px'}}>
+            <Col xs={8} style={{padding: '0px'}}>
               <ChatContent/>
             </Col>
           </Row>
