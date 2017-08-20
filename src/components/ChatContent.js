@@ -13,12 +13,37 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import CircularProgress from 'material-ui/CircularProgress';
 
+// Styles
+// Container
+const chatContainerStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%'
+}
+
+// ChatContent
+const chatAreaStyle = {
+  flex: 1,
+  overflowY: 'auto',
+  backgroundColor: '#ecf0f1'
+}
+
+// chatSender
+const chatSenderDivStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '95%',
+  height: '65px',
+  paddingLeft: '16px'
+}
+
 
 class ChatContent extends React.Component {
   render() {
     return (
-      <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>   
-        <div style={{flex: 6, overflowY: 'auto', backgroundColor: '#ecf0f1'}}>      
+      <div style={chatContainerStyle}>   
+        <div style={chatAreaStyle}>      
           <List>          
             <ListItem                                    
               secondaryText={
@@ -95,7 +120,7 @@ class ChatContent extends React.Component {
           </List>              
         </div>
 
-        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '95%', height: '65px', paddingLeft: '16px'}}>          
+        <div style={chatSenderDivStyle}>          
           <TextField hintText="Type a message" fullWidth={true}/>          
         </div>
       </div>
