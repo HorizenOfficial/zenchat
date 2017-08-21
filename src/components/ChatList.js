@@ -1,9 +1,11 @@
 import { iconStyle } from './Styles';
+import RoomSettings from './RoomSettings'
+
 import React, { Component } from 'react';
+import { Grid, Row, Col } from 'react-flexbox-grid'
 
 import {List, ListItem} from 'material-ui/List';
-import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
-import Avatar from 'material-ui/Avatar';
+
 import Dialog from 'material-ui/Dialog';
 import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
@@ -18,29 +20,12 @@ import TextField from 'material-ui/TextField';
 
 import CommunicationChatBubble from 'material-ui/svg-icons/communication/chat-bubble';
 import SettingsIconAsset from 'material-ui/svg-icons/action/settings-applications';
-import {red500, yellow500, blue500} from 'material-ui/styles/colors';
+import SyncIconAsset from 'material-ui/svg-icons/notification/sync'
+import {red500, yellow500, blue500, green500, grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
 
-
-// Icon buttons
-const iconButtonElement = (
-  <IconButton
-    touch={true}
-    tooltip="more"
-    tooltipPosition="bottom-left"
-  >
-    <MoreVertIcon color={grey400} />
-  </IconButton>
-);
-
-const rightIconMenu = (
-  <IconMenu iconButtonElement={iconButtonElement}>
-    <MenuItem>Rename Room</MenuItem>
-    <MenuItem>Get Room Code</MenuItem>
-  </IconMenu>
-);
 
 // Dialog
-class SetSettingsDialog extends React.Component {
+class NewRoomDialog extends React.Component {
   constructor(props){
     super(props)
 
@@ -59,7 +44,7 @@ class SetSettingsDialog extends React.Component {
 
   handleDialogClose(){
     this.setState({
-      dialogOpen: true
+      dialogOpen: false
     })
   }
 
@@ -67,48 +52,147 @@ class SetSettingsDialog extends React.Component {
     const actions = [
       <FlatButton
         label="Ok"
-        primary={true}
-        keyboardFocused={true}
-        onClick={this.handleClose}
+        primary={true}        
+        onClick={this.handleDialogClose}
       />,
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onClick={this.handleDialogClose}
+      />
     ];
 
     return (
-      <div>
-        <RaisedButton label="Dialog With Date Picker" onClick={this.handleOpen} />
+      <span>
+        <IconButton
+          tooltip="new room"
+          onClick={this.handleDialogOpen}
+          iconStyle={iconStyle.smallIcon}>              
+          <CommunicationChatBubble/>
+        </IconButton>
         <Dialog
-          title="Dialog With Date Picker"
+          title="New Room"
           actions={actions}
           modal={false}
-          open={this.state.open}
-          onRequestClose={this.handleClose}
-        >
-          Open a Date Picker dialog from within a dialog.          
+          open={this.state.dialogOpen}
+          onRequestClose={this.handleDialogClose}
+        >          
+          <TextField hintText="Room Code" fullWidth={true}/>          
         </Dialog>
-      </div>
+      </span>
     );
   }
 }
+
+class SettingsDialog extends React.Component {
+  constructor(props){
+    super(props)
+
+    this.handleDialogOpen = this.handleDialogOpen.bind(this)
+    this.handleDialogClose = this.handleDialogClose.bind(this)
+    this.state = {
+      dialogOpen: false
+    }
+  }
+
+  handleDialogOpen(){
+    this.setState({
+      dialogOpen: true
+    })
+  }
+
+  handleDialogClose(){
+    this.setState({
+      dialogOpen: false
+    })
+  }
+
+  render() {
+    const actions = [
+      <FlatButton
+        label="Ok"
+        primary={true}        
+        onClick={this.handleDialogClose}
+      />,
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onClick={this.handleDialogClose}
+      />
+    ];
+
+    return (
+      <span>
+        <IconButton
+          tooltip="settings"
+          onClick={this.handleDialogOpen}
+          iconStyle={iconStyle.smallIcon}>              
+          <SettingsIconAsset/>
+        </IconButton>
+        <Dialog
+          title="Settings"
+          actions={actions}
+          modal={false}
+          open={this.state.dialogOpen}
+          onRequestClose={this.handleDialogClose}
+          autoScrollBodyContent={true}
+        >          
+          <Grid fluid>
+            <Row>
+              <Col xs={6}>
+                <TextField
+                  hintText="Me"
+                  floatingLabelText="Nickname"
+                  floatingLabelFixed={true}
+                  fullWidth={true}
+                /><br />
+              </Col>
+              <Col xs={6}>
+                <TextField
+                  hintText="127.0.0.1"
+                  floatingLabelText="RPC Host"
+                  floatingLabelFixed={true}
+                  fullWidth={true}
+                /><br />
+                <TextField
+                  hintText="8232"
+                  floatingLabelText="RPC Port"
+                  floatingLabelFixed={true}
+                  fullWidth={true}
+                /><br />
+                <TextField
+                  hintText="username"
+                  floatingLabelText="RPC Username"
+                  floatingLabelFixed={true}
+                  fullWidth={true}
+                /><br />
+                <TextField
+                  hintText="password"
+                  floatingLabelText="RPC Password"
+                  floatingLabelFixed={true}
+                  fullWidth={true}
+                /><br />
+              </Col>              
+            </Row>
+          </Grid>      
+        </Dialog>
+      </span>
+    );
+  }
+}
+
 
 
 class ChatList extends React.Component {
   render() {
     return (
       <div style={{height: '100%', overflowY: 'auto', overflowX: 'hidden'}}>
-        <ListItem disabled={true} style={{padding: '0px'}}> 
-          <div style={{textAlign: 'right'}}>            
-            <IconButton
-              tooltip="new room"
-              iconStyle={iconStyle.smallIcon}>              
-              <CommunicationChatBubble color={grey400}/>
-            </IconButton>
-            <IconButton
-              tooltip="settings"
-              iconStyle={iconStyle.smallIcon}>
-              <SettingsIconAsset color={grey400}/>
-            </IconButton>            
+        <Subheader style={{padding: '0px'}}> 
+          <div style={{textAlign: 'right'}}>                        
+            <NewRoomDialog />
+            <SettingsDialog />            
           </div>
-        </ListItem>
+        </Subheader>
 
         <Divider/>
 
@@ -121,7 +205,7 @@ class ChatList extends React.Component {
               </p>
             }
             secondaryTextLines={2}
-            rightIconButton={rightIconMenu}
+            rightIconButton={<span><RoomSettings/></span>}
           />
           <Divider/>
           <ListItem                                    
@@ -132,7 +216,7 @@ class ChatList extends React.Component {
               </p>
             }
             secondaryTextLines={2}
-            rightIconButton={rightIconMenu}
+            rightIconButton={<span><RoomSettings/></span>}
           />
           <Divider/>
           <ListItem                        
@@ -143,7 +227,7 @@ class ChatList extends React.Component {
               </p>
             }
             secondaryTextLines={2}
-            rightIconButton={rightIconMenu}
+            rightIconButton={<span><RoomSettings/></span>}
           />
           <Divider />
           <ListItem                                    
@@ -154,7 +238,7 @@ class ChatList extends React.Component {
               </p>
             }
             secondaryTextLines={2}
-            rightIconButton={rightIconMenu}
+            rightIconButton={<span><RoomSettings/></span>}
           />
           <Divider />
           <ListItem
@@ -165,7 +249,7 @@ class ChatList extends React.Component {
               </p>
             }
             secondaryTextLines={2}
-            rightIconButton={rightIconMenu}
+            rightIconButton={<span><RoomSettings/></span>}
           />           
         </List>                      
     </div>
