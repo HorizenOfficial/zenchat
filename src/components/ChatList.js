@@ -1,5 +1,5 @@
 import { iconStyle } from './Styles';
-import RoomSettings from './RoomSettings'
+import RoomSettings from '../containers/Rooms'
 
 import React, { Component } from 'react';
 import { Grid, Row, Col } from 'react-flexbox-grid'
