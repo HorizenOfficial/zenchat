@@ -27,7 +27,7 @@ class SettingsDialog extends React.Component {
     this.handleDialogOpen = this.handleDialogOpen.bind(this)
     this.handleDialogClose = this.handleDialogClose.bind(this)
     this.state = {
-      dialogOpen: false
+      dialogOpen: false      
     }
   }
 
@@ -45,17 +45,12 @@ class SettingsDialog extends React.Component {
 
   render () {
     const actions = [
-      <FlatButton label='Ok' primary onClick={this.handleDialogClose} />,
-      <FlatButton
-        label='Cancel'
-        primary
-        onClick={this.handleDialogClose}
-      />
+      <FlatButton label='Done' primary onClick={this.handleDialogClose} />
     ]
 
     return (
       <span>
-        <IconButton tooltip='settings' onClick={this.handleDialogOpen}>
+        <IconButton tooltip='Settings' onClick={this.handleDialogOpen}>
           <SettingsIconAsset />
         </IconButton>
 

@@ -17,12 +17,14 @@ import DialogChatSettings from './DialogChatSettings'
 
 import { addNewChat, setChatName } from '../actions/ChatSettings'
 
-import '../assets/scss/ChatContent.scss'
 import CheckCircleIconAsset from 'material-ui/svg-icons/action/check-circle'
 import ProblemIconAsset from 'material-ui/svg-icons/action/report-problem'
 import { lightBlack, darkBlack, green500, red500 } from 'material-ui/styles/colors'
 
 import rpcCall from "../utils/rpc"
+
+import '../assets/scss/main.scss'
+
 
 class CheckRPCConnection extends Component {
   constructor(props) {
@@ -57,9 +59,13 @@ class CheckRPCConnection extends Component {
     }.bind(this))
   }
 
+  componentDidUpdate() {
+    this.checkRPCConnection()
+  }
+
   componentDidMount(){
     this.checkRPCConnection()
-    setInterval(this.checkRPCConnection(), 30000)
+    setInterval(this.checkRPCConnection(), 15000)
   }
 
   render () {    

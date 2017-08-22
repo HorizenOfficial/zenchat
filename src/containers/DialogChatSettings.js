@@ -1,4 +1,9 @@
+/*
+ * The three dots beside the list of chats
+ */
+
 import React, { Component } from 'react'
+import CopyToClipboard from 'react-copy-to-clipboard';
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -15,7 +20,7 @@ import TextField from 'material-ui/TextField'
 import Snackbar from 'material-ui/Snackbar'
 import FlatButton from 'material-ui/FlatButton'
 
-import { addNewChat, setChatName } from '../actions/ChatSettings'
+import { addNewChat, setChatName, deleteChat } from '../actions/ChatSettings'
 
 import "../assets/scss/main.scss"
 
@@ -31,16 +36,20 @@ class ChatSettings extends React.Component {
 
     this.state = {
       renameDialogOpen: false,
+      deleteDialogOpen: false,
       copyDialogOpen: false,
       snackbarOpen: false,
       tempRoomName: '',
     }
 
     this.handleRenameDialogOpen = this.handleRenameDialogOpen.bind(this)
-    this.handleRenameDialogClose = this.handleRenameDialogClose.bind(this)
+    this.handleRenameDialogClose = this.handleRenameDialogClose.bind(this)    
 
     this.handleCopyDialogOpen = this.handleCopyDialogOpen.bind(this)
     this.handleCopyDialogClose = this.handleCopyDialogClose.bind(this)
+
+    this.handleDeleteDialogOpen = this.handleDeleteDialogOpen.bind(this)
+    this.handleDeleteDialogClose = this.handleDeleteDialogClose.bind(this)
 
     this.handleSnackbarOpen = this.handleSnackbarOpen.bind(this)
     this.handleSnackbarClose = this.handleSnackbarClose.bind(this)
@@ -52,6 +61,14 @@ class ChatSettings extends React.Component {
 
   handleRenameDialogClose () {
     this.setState({ renameDialogOpen: false })
+  }
+
+  handleDeleteDialogOpen () {
+    this.setState({ deleteDialogOpen: true })
+  }
+
+  handleDeleteDialogClose () {
+    this.setState({ deleteDialogOpen: false })
   }
 
   handleCopyDialogOpen () {
@@ -68,19 +85,27 @@ class ChatSettings extends React.Component {
 
   handleSnackbarClose () {
     this.setState({ snackbarOpen: false })
-  }
+  }  
 
   render () {
-    const renameActions = [
-      <FlatButton label='Ok' primary={true}
-        onClick={() => { this.props.setChatName(this.props.address, this.state.tempRoomName); this.handleRenameDialogClose(); }}
-      />,
+    const renameActions = [      
+      <FlatButton onClick={() => { this.props.setChatName(this.props.address, this.state.tempRoomName); this.handleRenameDialogClose(); }} label='Ok' primary={true}/>,
       <FlatButton label='Cancel' primary={true} onClick={this.handleRenameDialogClose} />
     ]
 
     const copyActions = [
-      <FlatButton label='I Understand' primary={true} onClick={() => { this.handleCopyDialogClose(); this.handleSnackbarOpen() } } />,
+      <CopyToClipboard
+        text={this.props.secretCode}
+        onCopy={() => { this.handleCopyDialogClose(); this.handleSnackbarOpen() } } 
+      >
+        <FlatButton label='Just Give It To Me' primary={true} />
+      </CopyToClipboard>,
       <FlatButton label='Cancel' primary={false} onClick={this.handleCopyDialogClose} />
+    ]
+
+    const deleteActions = [
+      <FlatButton onClick={() => { this.props.deleteChat(this.props.address); this.handleDeleteDialogClose(); }} label='I Understand' primary={true}/>,
+      <FlatButton label='Cancel' primary={true} onClick={this.handleDeleteDialogClose} />
     ]
 
     return (
@@ -106,8 +131,15 @@ class ChatSettings extends React.Component {
           modal={false}
           open={this.state.copyDialogOpen}>
           <span className="spanAlert">Anyone who has access to the secret code has access to the following address:</span><br/><br/>
-          Address: {this.props.address}<br/>
+          {this.props.address}<br/>
           Amount: 0.01 ZEN
+        </Dialog>
+        <Dialog
+          title='Are you sure you want to delete this chat?'
+          actions={deleteActions}
+          modal={false}
+          open={this.state.deleteDialogOpen}>
+          <span className="spanAlert">If you don't have the secret code to the chat, it'll be lost <strong>forever</strong></span><br/><br/>                    
         </Dialog>
         <Snackbar
           open={this.state.snackbarOpen}
@@ -115,9 +147,11 @@ class ChatSettings extends React.Component {
           autoHideDuration={4000}
           onRequestClose={this.handleSnackbarClose} />
         <IconMenu iconButtonElement={iconButtonElement}>
-          <MenuItem onClick={this.handleRenameDialogOpen}> Rename Room
+          <MenuItem onClick={this.handleRenameDialogOpen}> Rename Chat
           </MenuItem>
           <MenuItem onClick={this.handleCopyDialogOpen}> Get Secret Code
+          </MenuItem>
+          <MenuItem onClick={this.handleDeleteDialogOpen}> Delete Chat
           </MenuItem>
         </IconMenu>
       </div>
@@ -135,7 +169,8 @@ function matchDispatchToProps (dispatch) {
   return bindActionCreators(
     {
       addNewChat,
-      setChatName
+      setChatName,
+      deleteChat
     },
     dispatch
   )

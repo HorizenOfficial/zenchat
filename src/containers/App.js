@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import electron from 'electron'
-
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
 import ChatApp from '../components/ChatApp'
@@ -13,14 +11,11 @@ import { connect } from 'react-redux';
 import { setRPCUsername, setRPCPassword, setRPCHost, setRPCPort } from '../actions/RPCSettings'
 import { setUserNickname } from '../actions/UserSettings'
 
+import { FOLDER_NAME, FOLDER_LOCATION, CONFIG_FILENAME, CONFIG_FILE_LOCATION } from '../constants/storage'
+
 import fs from 'fs'
 import path from 'path'
 
-// File locations
-const FOLDER_NAME = 'zenchat'
-const FOLDER_LOCATION = path.join(electron.remote.app.getPath('appData'), FOLDER_NAME)
-const CONFIG_FILENAME = 'config.json'
-const CONFIG_FILE_LOCATION = path.join(FOLDER_LOCATION, CONFIG_FILENAME)
 
 class App extends Component {
   constructor(props){
