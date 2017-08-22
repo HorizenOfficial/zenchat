@@ -75,7 +75,7 @@ class RoomSettings extends React.Component {
 
 function mapStateToProps(state){  
   return {
-    dialogOpen: state.dialogOpen
+    dialogOpen: state.potatoes
   }
 }
 

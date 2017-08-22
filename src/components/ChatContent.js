@@ -22,6 +22,8 @@ import CheckCircleIconAsset from 'material-ui/svg-icons/action/check-circle';
 import InformationIconAsset from 'material-ui/svg-icons/action/info'
 import {grey400, darkBlack, lightBlack, green500} from 'material-ui/styles/colors';
 
+import '../assets/css/ChatContent.scss'
+
 // Styles
 // Container
 const chatContainerStyle = {
