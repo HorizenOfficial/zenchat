@@ -66,18 +66,30 @@ class StepperSetup extends Component {
         }
       }.bind(this))
     }
+
+    // Finished, should change
+    // To the ChatApp on click
+    if (stepIndex >= 2){
+      this.props.configureZenChat()
+    }
     
-    this.setState({
-      stepIndex: stepIndex + 1,      
-      finished: finished
-    });        
+    // Don't let it go beyond finish
+    else{
+      this.setState({
+        stepIndex: stepIndex + 1,      
+        finished: finished
+      });  
+    }      
   };
 
   handlePrev () {
     const {stepIndex} = this.state;
     if (stepIndex > 0) {
-      this.setState({stepIndex: stepIndex - 1});
-    }
+      this.setState({
+        stepIndex: stepIndex - 1,
+        connectionEstablished: false,
+      });
+    }    
   };
 
   getStepContent(stepIndex) {
@@ -168,7 +180,7 @@ class StepperSetup extends Component {
 
   render() {
     const {finished, stepIndex} = this.state;
-    const contentStyle = {margin: '0 16px', width: '100%'};
+    const contentStyle = {margin: '0 16px', width: '95%'};
 
     return (      
       <div style={{width: '100%', maxWidth: 700, margin: 'auto'}}>

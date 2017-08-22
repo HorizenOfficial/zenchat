@@ -25,6 +25,9 @@ export function setRPCHost (rpcHost) {
 }
 
 export function setRPCPort (rpcPort) {
+  // Always convert it to a string
+  rpcPort = rpcPort.toString()  
+
   const intRpcPort = parseInt(rpcPort.replace('/\D/g', ''))
   return {
     type: SET_RPC_PORT,

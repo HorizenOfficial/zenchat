@@ -1,7 +1,7 @@
 import { SET_USER_NICKNAME } from '../actions/UserSettings'
 
 const initialUserSettings = {
-  'nickname': 'Me'
+  'nickname': 'Me'  
 }
 
 export default function UserSettingsReducer (state=initialUserSettings, action){  
