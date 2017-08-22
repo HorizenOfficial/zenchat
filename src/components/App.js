@@ -4,37 +4,20 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import ChatList from './ChatList'
 import ChatContent from './ChatContent'
 
-// Styles
-const zeroPaddingMargin = {
-  padding: '0px',
-  margin: '0px'
-}
-
-const rowZeroPaddingNoWrap = {
-  height: '100vh',
-  flexWrap: 'nowrap'
-}
-
-const zeroPadding = {
-  padding: '0px'
-}
-
-const colBorderRight = {
-  borderRight: '1px solid #ddd',
-  padding: '0px'
-}
+// Import scss as last file otherwise it won't work
+import '../assets/scss/App.scss'
 
 // Application
 class App extends React.Component {
-  render () {
+  render () {    
     return (
       <MuiThemeProvider>
-        <Grid fluid style={zeroPaddingMargin}>
-          <Row style={rowZeroPaddingNoWrap}>
-            <Col xs={4} style={colBorderRight}>
+        <Grid fluid className="zeroPaddingMargin">
+          <Row className="rowZeroPaddingNoWrap">
+            <Col xs={4} className="colBorderRight">
             <ChatList/>
             </Col>
-            <Col xs={8} style={zeroPadding}>
+            <Col xs={8} className="zeroPadding">
             <ChatContent/>
             </Col>
           </Row>

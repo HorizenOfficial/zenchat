@@ -1,9 +1,6 @@
-import { iconStyle } from './Styles';
-import RoomSettings from './RoomSettings'
 import React, { Component } from 'react';
 
 import {List, ListItem} from 'material-ui/List';
-
 import CircularProgress from 'material-ui/CircularProgress';
 import Divider from 'material-ui/Divider';
 import Dialog from 'material-ui/Dialog';
@@ -17,51 +14,13 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Snackbar from 'material-ui/Snackbar';
 import Subheader from 'material-ui/Subheader';
 import TextField from 'material-ui/TextField';
-
 import CheckCircleIconAsset from 'material-ui/svg-icons/action/check-circle';
 import InformationIconAsset from 'material-ui/svg-icons/action/info'
 import {grey400, darkBlack, lightBlack, green500} from 'material-ui/styles/colors';
 
-import '../assets/css/ChatContent.scss'
+import RoomSettings from './RoomSettings'
+import '../assets/scss/ChatContent.scss'
 
-// Styles
-// Container
-const chatContainerStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%'
-}
-
-// ChatContent
-const chatAreaStyle = {
-  flex: 1,
-  overflowY: 'auto',
-  backgroundColor: '#ecf0f1'
-}
-
-// ChatSending Textbox
-const chatSenderDivStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '95%',
-  height: '65px',
-  paddingLeft: '16px'
-}
-
-// Room Title
-const roomTitleStyle = {
-  paddingLeft: '16px',
-  fontFamily: 'Roboto'
-}
-
-// Room info div
-const roomInfoDivStyle = {
-  alignItems: 'center',
-  justifyContent: 'center',
-  display: 'flex',
-  height: '46px'
-}
 
 // Components
 class NicknameDialog extends React.Component {
@@ -147,8 +106,8 @@ class ChatRoomInfo extends React.Component {
 
   render() {
     return (
-      <div style={roomInfoDivStyle}>
-        <span style={roomTitleStyle}>Room Chat Name Here</span>
+      <div className="roomInfoDivStyle">
+        <span className="roomTitleStyle">Room Chat Name Here</span>
         <div style={{marginLeft: 'auto'}}>
           <IconButton tooltip="room info" onClick={this.handleToggleDrawer}>
             <InformationIconAsset/>
@@ -176,9 +135,9 @@ class ChatRoomInfo extends React.Component {
 class ChatContent extends React.Component {
   render() {
     return (
-      <div style={chatContainerStyle}>
+      <div className="chatContainerStyle">
         <ChatRoomInfo/>
-        <div style={chatAreaStyle}>      
+        <div className="chatAreaStyle">      
           <List>          
             <ListItem rightIcon={<CheckCircleIconAsset color={green500}/>}>
               <p>
@@ -213,7 +172,7 @@ class ChatContent extends React.Component {
           </List>              
         </div>
 
-        <div style={chatSenderDivStyle}>          
+        <div className="chatSenderDivStyle">          
           <TextField hintText="Type a message" fullWidth={true}/>  
         </div>
       </div>

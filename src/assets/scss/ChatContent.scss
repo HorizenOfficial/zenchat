@@ -1,0 +1,36 @@
+.chatContainerStyle {
+  display: flex;
+  flex-direction: column;
+  height: 100%
+}
+
+// ChatContent
+.chatAreaStyle {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #ecf0f1
+}
+
+// ChatSending Textbox
+.chatSenderDivStyle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 95%;
+  height: 65px;
+  padding-left: 16px
+}
+
+// Room Title
+.roomTitleStyle {
+  padding-left: 16px;
+  font-family: Roboto
+}
+
+// Room info div
+.roomInfoDivStyle {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  height: 46px
+}

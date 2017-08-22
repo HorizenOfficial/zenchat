@@ -1,0 +1,19 @@
+// Styles
+.zeroPaddingMargin {
+  padding: 0px;
+  margin: 0px;
+}
+
+.rowZeroPaddingNoWrap {
+  height: 100vh;
+  flex-wrap: nowrap;
+}
+
+.zeroPadding {
+  padding: 0px;
+}
+
+.colBorderRight {
+  border-right: 1px solid #ddd;
+  padding: 0px;
+}

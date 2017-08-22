@@ -1,4 +1,3 @@
-import { iconStyle } from './Styles';
 import RoomSettings from '../containers/Rooms'
 
 import React, { Component } from 'react';
@@ -23,6 +22,7 @@ import SettingsIconAsset from 'material-ui/svg-icons/action/settings-application
 import SyncIconAsset from 'material-ui/svg-icons/notification/sync'
 import {red500, yellow500, blue500, green500, grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
 
+import '../assets/scss/ChatContent.scss'
 
 // Dialog
 class NewRoomDialog extends React.Component {
@@ -51,12 +51,12 @@ class NewRoomDialog extends React.Component {
   render() {
     const actions = [
       <FlatButton
-        label="Ok"
+        label='Ok'
         primary={true}        
         onClick={this.handleDialogClose}
       />,
       <FlatButton
-        label="Cancel"
+        label='Cancel'
         primary={true}
         onClick={this.handleDialogClose}
       />
@@ -65,19 +65,18 @@ class NewRoomDialog extends React.Component {
     return (
       <span>
         <IconButton
-          tooltip="new room"
-          onClick={this.handleDialogOpen}
-          iconStyle={iconStyle.smallIcon}>              
-          <CommunicationChatBubble/>
+          tooltip='new room'
+          onClick={this.handleDialogOpen}>              
+          <CommunicationChatBubble viewBox='0 0 24 24'/>
         </IconButton>
         <Dialog
-          title="New Room"
+          title='New Room'
           actions={actions}
           modal={false}
           open={this.state.dialogOpen}
           onRequestClose={this.handleDialogClose}
         >          
-          <TextField hintText="Room Code" fullWidth={true}/>          
+          <TextField hintText='Room Code' fullWidth={true}/>          
         </Dialog>
       </span>
     );
@@ -110,12 +109,12 @@ class SettingsDialog extends React.Component {
   render() {
     const actions = [
       <FlatButton
-        label="Ok"
+        label='Ok'
         primary={true}        
         onClick={this.handleDialogClose}
       />,
       <FlatButton
-        label="Cancel"
+        label='Cancel'
         primary={true}
         onClick={this.handleDialogClose}
       />
@@ -124,13 +123,12 @@ class SettingsDialog extends React.Component {
     return (
       <span>
         <IconButton
-          tooltip="settings"
-          onClick={this.handleDialogOpen}
-          iconStyle={iconStyle.smallIcon}>              
+          tooltip='settings'
+          onClick={this.handleDialogOpen}>
           <SettingsIconAsset/>
         </IconButton>
         <Dialog
-          title="Settings"
+          title='Settings'
           actions={actions}
           modal={false}
           open={this.state.dialogOpen}
@@ -141,34 +139,34 @@ class SettingsDialog extends React.Component {
             <Row>
               <Col xs={6}>
                 <TextField
-                  hintText="Me"
-                  floatingLabelText="Nickname"
+                  hintText='Me'
+                  floatingLabelText='Nickname'
                   floatingLabelFixed={true}
                   fullWidth={true}
                 /><br />
               </Col>
               <Col xs={6}>
                 <TextField
-                  hintText="127.0.0.1"
-                  floatingLabelText="RPC Host"
+                  hintText='127.0.0.1'
+                  floatingLabelText='RPC Host'
                   floatingLabelFixed={true}
                   fullWidth={true}
                 /><br />
                 <TextField
-                  hintText="8232"
-                  floatingLabelText="RPC Port"
+                  hintText='8232'
+                  floatingLabelText='RPC Port'
                   floatingLabelFixed={true}
                   fullWidth={true}
                 /><br />
                 <TextField
-                  hintText="username"
-                  floatingLabelText="RPC Username"
+                  hintText='username'
+                  floatingLabelText='RPC Username'
                   floatingLabelFixed={true}
                   fullWidth={true}
                 /><br />
                 <TextField
-                  hintText="password"
-                  floatingLabelText="RPC Password"
+                  hintText='password'
+                  floatingLabelText='RPC Password'
                   floatingLabelFixed={true}
                   fullWidth={true}
                 /><br />

@@ -3,8 +3,6 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { handleDialogOpen, handleDialogClose } from '../actions/Rooms'
 
-import { iconStyle } from '../components/Styles';
-
 import {List, ListItem} from 'material-ui/List';
 import Dialog from 'material-ui/Dialog';
 import {grey400, darkBlack, lightBlack, green500} from 'material-ui/styles/colors';
@@ -23,7 +21,7 @@ const iconButtonElement = (
     tooltip="more"
     tooltipPosition="bottom-left"
   >
-  <MoreVertIcon color={grey400} />
+    <MoreVertIcon color={grey400} />
   </IconButton>
 );
 
@@ -41,7 +39,7 @@ class RoomSettings extends React.Component {
         onClick={this.props.handleDialogClose}
       />
     ];
-    console.log(this.props.dialogOpen)
+    
     return (
       <div>
         <Dialog
