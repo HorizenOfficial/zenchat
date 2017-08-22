@@ -16,7 +16,7 @@ import ProblemIconAsset from 'material-ui/svg-icons/action/report-problem'
 import {red500, green500} from 'material-ui/styles/colors';
 
 import "../assets/scss/main.scss"
-import zencash from 'bitcoin'
+import rpcCall from "../utils/rpc"
 
 // Setup ZenChat settings page
 class StepperSetup extends Component {
@@ -42,16 +42,15 @@ class StepperSetup extends Component {
     // Check after first index
     // V stateful I know
     if (stepIndex === 0){    
-      var rpcClient = new zencash.Client({
-        host: this.props.rpcSettings.rpcHost,
-        port: this.props.rpcSettings.rpcPort,
-        user: this.props.rpcSettings.rpcUsername,
-        pass: this.props.rpcSettings.rpcPassword,
-        timeout: 10000      
-      })
+
+      // RPC Call
+      const host = this.props.rpcSettings.rpcHost
+      const port = this.props.rpcSettings.rpcPort
+      const user = this.props.rpcSettings.rpcUsername
+      const pass = this.props.rpcSettings.rpcPassword
+      const timeout = 10000            
       
-      rpcClient.cmd('getinfo', function(err, resp, headers){
-        console.log(err, resp)
+      rpcCall(host, port, user, pass, timeout).cmd('getinfo', function(err, resp, headers){        
         if (err){
           this.setState({
             connectionEstablished: false,

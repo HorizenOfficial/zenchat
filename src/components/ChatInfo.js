@@ -5,7 +5,7 @@ import Drawer from 'material-ui/Drawer'
 import IconButton from 'material-ui/IconButton'
 import Subheader from 'material-ui/Subheader'
 
-import DialogChatSettings from './DialogChatSettings'
+import DialogChatSettings from '../containers/DialogChatSettings'
 import DialogSetNickname from './DialogSetNickname'
 
 import InformationIconAsset from 'material-ui/svg-icons/action/info'

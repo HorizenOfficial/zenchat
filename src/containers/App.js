@@ -27,7 +27,7 @@ class App extends Component {
     super(props)
 
     this.state = {
-      configured: false
+      configured: true
     }
 
     this.configureZenChat = this.configureZenChat.bind(this)

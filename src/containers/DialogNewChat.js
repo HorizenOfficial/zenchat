@@ -1,20 +1,27 @@
 import React, { Component } from 'react';
 
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 
-import CommunicationChatBubble from 'material-ui/svg-icons/communication/chat-bubble';
+import { addNewChat } from '../actions/ChatSettings'
 
-export default class NewChatDialog extends React.Component {
+import CommunicationChatBubble from 'material-ui/svg-icons/communication/chat-bubble';
+import '../assets/scss/main.scss'
+
+class DialogNewChat extends React.Component {
   constructor(props){
     super(props)
 
     this.handleDialogOpen = this.handleDialogOpen.bind(this)
     this.handleDialogClose = this.handleDialogClose.bind(this)
     this.state = {
-      dialogOpen: false
+      dialogOpen: false,
+      tempSecretCode: ''
     }
   }
 
@@ -35,7 +42,7 @@ export default class NewChatDialog extends React.Component {
       <FlatButton
         label='Ok'
         primary={true}        
-        onClick={this.handleDialogClose}
+        onClick={() => {this.props.addNewChat(this.state.tempSecretCode); this.handleDialogClose()} }
       />,
       <FlatButton
         label='Cancel'
@@ -57,10 +64,31 @@ export default class NewChatDialog extends React.Component {
           modal={false}
           open={this.state.dialogOpen}
           onRequestClose={this.handleDialogClose}
-        >          
-          <TextField hintText='Chat Code' fullWidth={true}/>          
+        >
+          <span className="spanAlert">A weak secret code <strong>will</strong> compromise your room!</span>
+          <TextField
+            hintText='Secret Code. E.g. red pig beside take two keys on mouse' fullWidth={true}
+            onChange={(e) => this.setState({ tempSecretCode: e.target.value })}
+            />
         </Dialog>
       </span>
     );
   }
 }
+
+function mapStateToProps (state) {
+  return {
+    chatList: state.chatList    
+  }
+}
+
+function matchDispatchToProps (dispatch) {
+  return bindActionCreators(
+    {
+      addNewChat
+    },
+    dispatch
+  )
+}
+
+export default connect(mapStateToProps, matchDispatchToProps)(DialogNewChat)
