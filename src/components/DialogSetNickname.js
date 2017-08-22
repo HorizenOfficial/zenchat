@@ -52,7 +52,7 @@ export default class SetNicknameDialog extends React.Component {
           secondaryText="Potatoes are nice"
         />
         <Dialog
-          title="Set Nickname"
+          title="Set Your Nickname"
           actions={actions}
           modal={false}
           open={this.state.dialogOpen}

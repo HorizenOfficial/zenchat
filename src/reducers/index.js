@@ -1,8 +1,10 @@
 import { combineReducers } from 'redux'
-import RoomSettingsReducer from './Rooms'
+import RPCSettingsReducer from './RPCSettings'
+import UserSettingsReducer from './UserSettings'
 
 const allReducers = combineReducers({
-  potatoes: RoomSettingsReducer
+  rpcSettings: RPCSettingsReducer,
+  userSettings: UserSettingsReducer
 })
 
 export default allReducers
