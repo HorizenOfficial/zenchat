@@ -12,55 +12,47 @@ import { lightBlack, darkBlack, green500 } from 'material-ui/styles/colors'
 
 import '../assets/scss/ChatContent.scss'
 
-class ChatContent extends React.Component {
+// Chat Content items
+// are the messages themselves
+class ChatContentItem extends Component {
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      sendComplete: true
+    }
+  }
+
+  render () {
+    return (
+      <ListItem rightIcon={
+          this.state.sendComplete ?
+          <CheckCircleIconAsset color={green500}/> :
+          <div><CircularProgress size={15}/></div>
+      }>
+        <p>
+          <span className="chatMessageSender">znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf</span>
+          <br />
+          <span className="chatMessageContent">We should eat this: grated squash. Corn and tomatillo tacos.</span>
+          <br />
+        </p>
+      </ListItem>
+    )
+  }
+}
+
+export default class ChatContent extends Component {
   render () {
     return (
       <div className='chatContainerStyle'>
         <ChatInfo/>
         <div className='chatAreaStyle'>
           <List>
-            <ListItem rightIcon={<CheckCircleIconAsset color={green500} />}>
-              <p>
-                <span style={{color: darkBlack,  fontSize: '15px'}}>znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf</span>
-                <br />
-                <span style={{color: lightBlack, fontSize: '14px'}}>We should eat this: grated squash. Corn and tomatillo tacos.</span>
-                <br />
-              </p>
-            </ListItem>
-            <ListItem rightIcon={<div>
-                                   <CircularProgress size={15} />
-                                 </div>}>
-              <p>
-                <span style={{color: darkBlack,  fontSize: '15px'}}>znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf</span>
-                <br />
-                <span style={{color: lightBlack, fontSize: '14px'}}>We should eat this: grated squash. Corn and tomatillo tacos.</span>
-                <br />
-              </p>
-            </ListItem>
-            <ListItem rightIcon={<CircularProgress size={15} />}>
-              <p>
-                <span style={{color: darkBlack,  fontSize: '15px'}}>znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf</span>
-                <br />
-                <span style={{color: lightBlack, fontSize: '14px'}}>We should eat this: grated squash. Corn and tomatillo tacos.</span>
-                <br />
-              </p>
-            </ListItem>
-            <ListItem rightIcon={<CircularProgress size={15} />}>
-              <p>
-                <span style={{color: darkBlack,  fontSize: '15px'}}>znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf</span>
-                <br />
-                <span style={{color: lightBlack, fontSize: '14px'}}>We should eat this: grated squash. Corn and tomatillo tacos.</span>
-                <br />
-              </p>
-            </ListItem>
-            <ListItem rightIcon={<CircularProgress size={15} />}>
-              <p>
-                <span style={{color: darkBlack,  fontSize: '15px'}}>Me</span>
-                <br />
-                <span style={{color: lightBlack, fontSize: '14px'}}>We should eat this: grated squash. Corn and tomatillo tacos.</span>
-                <br />
-              </p>
-            </ListItem>
+            <ChatContentItem/>
+            <ChatContentItem/>
+            <ChatContentItem/>
+            <ChatContentItem/>
+            <ChatContentItem/>
           </List>
         </div>
         <ChatSender />
@@ -68,5 +60,3 @@ class ChatContent extends React.Component {
     )
   }
 }
-
-export default ChatContent

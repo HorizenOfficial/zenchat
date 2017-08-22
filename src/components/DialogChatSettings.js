@@ -66,20 +66,20 @@ export default class ChatSettings extends React.Component {
     return (
       <div>
         <Dialog
-          title='Set Room Name'
+          title='Set Chat Name'
           actions={actions}
           modal={false}
           open={this.state.dialogOpen}>
           <TextField
             hintText='Core Devs for Eagle Hawk'
-            floatingLabelText='Room Name'
+            floatingLabelText='Chat Name'
             floatingLabelFixed={true}
             fullWidth={true} />
           <br />
         </Dialog>
         <Snackbar
           open={this.state.snackbarOpen}
-          message='Room code copied to clipboard'
+          message='Chat code copied to clipboard'
           autoHideDuration={4000}
           onRequestClose={this.handleSnackbarClose} />
         <IconMenu iconButtonElement={iconButtonElement}>

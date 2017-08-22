@@ -1,32 +1,42 @@
-import React, { Component } from 'react'
-import { Grid, Row, Col } from 'react-flexbox-grid'
-
-import ChatList from './ChatList'
-import ChatContent from './ChatContent'
+import React, { Component } from 'react';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
-// Import scss as last file otherwise it won't work
-import '../assets/scss/App.scss'
+import ChatApp from './ChatApp'
+import StepperSetup from './StepperSetup'
 
-// Application
-class App extends React.Component {
-  render () {
+import fs from 'fs'
+
+export default class App extends Component {
+  constructor(props){
+    super(props)
+
+    this.isZenChatConfigured = this.isZenChatConfigured.bind(this)
+    this.checkZenChatConfigured = this.checkZenChatConfigured.bind(this)
+
+    this.state = {
+      configured: this.isZenChatConfigured()
+    }
+  }
+
+  // Check for folders etc
+  isZenChatConfigured() {
+    return false
+  }
+
+  // Checks if zenchat is configured
+  // if it is then reload it
+  checkZenChatConfigured() {
+    this.setState({
+      configured: this.isZenChatConfigured()
+    })
+  }
+  
+  render () {    
     return (
       <MuiThemeProvider>
-        <Grid fluid className='zeroPaddingMargin'>
-          <Row className='rowZeroPaddingNoWrap'>
-            <Col xs={4} className='colBorderRight'>
-            <ChatList/>
-            </Col>
-            <Col xs={8} className='zeroPadding'>
-            <ChatContent/>
-            </Col>
-          </Row>
-        </Grid>
+        {this.state.configured? <ChatApp/> : <StepperSetup/>}
       </MuiThemeProvider>
     )
   }
 }
-
-export default App

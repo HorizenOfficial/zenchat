@@ -14,7 +14,18 @@ import '../assets/scss/ChatContent.scss'
 
 import { darkBlack, lightBlack } from 'material-ui/styles/colors'
 
-class ChatList extends React.Component {
+class ChatListItem extends Component {
+  render () {
+    return (
+      <ListItem secondaryText={<p>
+        <span style={{color: darkBlack}}>znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf</span>
+        <br /> I&apos;ll be in your neighborhood doing errands this weekend. Do you want to grab brunch?
+      </p>} secondaryTextLines={2} rightIconButton={<span><DialogChatSettings/></span>} />
+    )
+  }
+}
+
+export default class ChatList extends Component {
   render () {
     return (
       <div style={{height: '100%', overflowY: 'auto', overflowX: 'hidden'}}>
@@ -26,34 +37,16 @@ class ChatList extends React.Component {
         </Subheader>
         <Divider/>
         <List>
-          <ListItem secondaryText={<p>
-                                     <span style={{color: darkBlack}}>znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf</span>
-                                     <br /> I&apos;ll be in your neighborhood doing errands this weekend. Do you want to grab brunch?
-                                   </p>} secondaryTextLines={2} rightIconButton={<span><DialogChatSettings/></span>} />
+          <ChatListItem />
           <Divider/>
-          <ListItem secondaryText={<p>
-                                     <span style={{color: darkBlack}}>znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf</span>
-                                     <br /> Wish I could come, but I&apos;m out of town this weekend.
-                                   </p>} secondaryTextLines={2} rightIconButton={<span><DialogChatSettings/></span>} />
+          <ChatListItem />
           <Divider/>
-          <ListItem secondaryText={<p>
-                                     <span style={{color: darkBlack}}>Oui oui</span>
-                                     <br /> Do you have any Paris recs? Have you ever been?
-                                   </p>} secondaryTextLines={2} rightIconButton={<span><DialogChatSettings/></span>} />
-          <Divider />
-          <ListItem secondaryText={<p>
-                                     <span style={{color: darkBlack}}>znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf</span>
-                                     <br /> Do you have any ideas what we can get Heidi for her birthday? How about a pony?
-                                   </p>} secondaryTextLines={2} rightIconButton={<span><DialogChatSettings/></span>} />
-          <Divider />
-          <ListItem secondaryText={<p>
-                                     <span style={{color: darkBlack}}>znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf</span>
-                                     <br /> We should eat this: grated squash. Corn and tomatillo tacos.
-                                   </p>} secondaryTextLines={2} rightIconButton={<span><DialogChatSettings/></span>} />
+          <ChatListItem />
+          <Divider/>
+          <ChatListItem />
+          <Divider/>          
         </List>
       </div>
     )
   }
 }
-
-export default ChatList

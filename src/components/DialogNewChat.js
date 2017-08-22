@@ -47,18 +47,18 @@ export default class NewChatDialog extends React.Component {
     return (
       <span>
         <IconButton
-          tooltip='new room'
+          tooltip='New Chat'
           onClick={this.handleDialogOpen}>              
           <CommunicationChatBubble/>
         </IconButton>
         <Dialog
-          title='New Room'
+          title='New Chat'
           actions={actions}
           modal={false}
           open={this.state.dialogOpen}
           onRequestClose={this.handleDialogClose}
         >          
-          <TextField hintText='Room Code' fullWidth={true}/>          
+          <TextField hintText='Chat Code' fullWidth={true}/>          
         </Dialog>
       </span>
     );
