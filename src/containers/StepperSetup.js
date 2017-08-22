@@ -39,22 +39,16 @@ class StepperSetup extends Component {
     const finished = stepIndex >= 2
     
     // Create a new RPC client and check connection settings
+    // Check after first index
+    // V stateful I know
     if (stepIndex === 0){    
       var rpcClient = new zencash.Client({
         host: this.props.rpcSettings.rpcHost,
         port: this.props.rpcSettings.rpcPort,
         user: this.props.rpcSettings.rpcUsername,
-        password: this.props.rpcSettings.rpcPassword,
+        pass: this.props.rpcSettings.rpcPassword,
         timeout: 10000      
       })
-      console.log({
-        host: this.props.rpcSettings.rpcHost,
-        port: this.props.rpcSettings.rpcPort,
-        user: this.props.rpcSettings.rpcUsername,
-        password: this.props.rpcSettings.rpcPassword,
-        timeout: 10000      
-      })
-      console.log(rpcClient)
       
       rpcClient.cmd('getinfo', function(err, resp, headers){
         console.log(err, resp)
