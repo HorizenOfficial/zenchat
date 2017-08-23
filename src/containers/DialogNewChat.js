@@ -125,12 +125,12 @@ class DialogNewChat extends React.Component {
             />
         </Dialog>
         <Dialog
-          title='Syncing with blockchain...'
+          title='Rescanning blockchain...'
           open={this.state.dialogSyncOpen}
         >
           <div style={{textAlign: 'center'}}>
             <CircularProgress size={75}/><br/><br/>
-            <span>Syncing blockchain with the new chat, dialog will automatically close upon completion. Takes ~ 5 - 10 minutes depending on your server.</span>
+            <span>Rescanning blockchain, dialog will automatically close upon completion. Do NOT close your daemon. Takes ~5 - 10 minutes.</span>
           </div>          
         </Dialog>
       </span>

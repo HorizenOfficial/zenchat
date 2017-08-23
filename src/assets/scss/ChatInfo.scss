@@ -1,0 +1,18 @@
+// Room info div
+.chatInfoDivStyle {  
+  align-items: center;
+  justify-content: space-between;
+  display: flex;
+  width: 100%;
+  height: 46px;  
+}
+
+// Room Title
+.chatTitleStyle {
+  flex: 1;
+  padding-left: 16px;
+  font-family: 'Roboto', sans-serif;  
+  overflow: hidden;
+  word-wrap: nowrap;
+  text-overflow: ellipsis;
+}

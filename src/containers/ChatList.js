@@ -16,6 +16,7 @@ import DialogAppSettings from './DialogAppSettings'
 import DialogChatSettings from './DialogChatSettings'
 
 import { addNewChat, setChatName } from '../actions/ChatSettings'
+import { selectChatContent } from '../actions/ChatContent'
 
 import CheckCircleIconAsset from 'material-ui/svg-icons/action/check-circle'
 import ProblemIconAsset from 'material-ui/svg-icons/action/report-problem'
@@ -83,10 +84,11 @@ class CheckRPCConnection extends Component {
 
 class ChatListItem extends Component {
   render () {
-    const chatName = this.props.chatName === '' ? this.props.address : this.props.chatName
-
+    const chatName = this.props.chatName === '' ? this.props.address : this.props.chatName    
     return (
       <ListItem
+        style={this.props.selected ? {backgroundColor: '#ecf0f1'} : null }
+        onClick={() => this.props.selectChatContent(this.props.address)}
         secondaryText={<p><span style={{color: darkBlack}}>{chatName}</span><br /></p>}
         secondaryTextLines={2}
         rightIconButton={<span><DialogChatSettings {...this.props}/></span>}
@@ -114,11 +116,15 @@ class ChatList extends Component {
               this.props.chatList.map(function(chat){
                 return (
                   <div>
-                    <ChatListItem {...chat} />
+                    <ChatListItem
+                      {...chat}
+                      selectChatContent={this.props.selectChatContent}
+                      selected={this.props.chatContent.address === chat.address}
+                    />
                     <Divider/>
                   </div>
                 )
-              })
+              }.bind(this))
             }        
           </List>
         </div>
@@ -133,6 +139,7 @@ class ChatList extends Component {
 
 function mapStateToProps (state) {  
   return {
+    chatContent: state.chatContent,
     chatList: state.chatList,
     rpcSettings: state.rpcSettings
   }
@@ -142,7 +149,8 @@ function matchDispatchToProps (dispatch) {
   return bindActionCreators(
     {
       addNewChat,
-      setChatName
+      setChatName,
+      selectChatContent
     },
     dispatch
   )

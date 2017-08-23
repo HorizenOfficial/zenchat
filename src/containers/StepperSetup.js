@@ -105,7 +105,7 @@ class StepperSetup extends Component {
               value={this.props.rpcSettings.rpcHost}
             />
             <TextField
-              hintText="8232"
+              hintText="8233"
               floatingLabelText="Port"
               floatingLabelFixed={true}
               fullWidth={true}

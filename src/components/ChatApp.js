@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Grid, Row, Col } from 'react-flexbox-grid'
 
 import ChatList from '../containers/ChatList'
-import ChatContent from './ChatContent'
+import ChatContent from '../containers/ChatContent'
 
 // Import scss as last file otherwise it won't work
 import '../assets/scss/ChatApp.scss'

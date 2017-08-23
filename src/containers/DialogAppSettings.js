@@ -85,7 +85,7 @@ class SettingsDialog extends React.Component {
                 />
                 <br />
                 <TextField
-                  hintText='8232'
+                  hintText='8233'
                   floatingLabelText='RPC Port'
                   floatingLabelFixed={true}
                   fullWidth={true}
