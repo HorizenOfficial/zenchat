@@ -7,16 +7,19 @@ import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 import { setRPCUsername, setRPCPassword, setRPCHost, setRPCPort } from '../actions/RPCSettings'
-import { setUserNickname } from '../actions/UserSettings'
+import { setUserNickname, setSendAddress } from '../actions/UserSettings'
 
 import CheckCircleIconAsset from 'material-ui/svg-icons/action/check-circle'
 import ProblemIconAsset from 'material-ui/svg-icons/action/report-problem'
 import {red500, green500} from 'material-ui/styles/colors';
 
-import "../assets/scss/main.scss"
 import rpcCall from "../utils/rpc"
+import "../assets/scss/main.scss"
+
 
 // Setup ZenChat settings page
 class StepperSetup extends Component {
@@ -25,13 +28,72 @@ class StepperSetup extends Component {
 
     this.handleNext = this.handleNext.bind(this)
     this.handlePrev = this.handlePrev.bind(this)
+    this.getAvailableAddresses = this.getAvailableAddresses.bind(this)
+    this.handleSelectChange = this.handleSelectChange.bind(this)
+    this.handleCheckRPCConnection = this.handleCheckRPCConnection.bind(this)
 
     this.state = {
       finished: false,
+      addresses: [],
+      selectedAddress: '',
       stepIndex: 0,
       connectionEstablished: false,
       connectionFailed: false
     }
+  }
+
+  // Gets available Z Addresses
+  getAvailableAddresses () {
+    const host = this.props.rpcSettings.rpcHost
+    const port = this.props.rpcSettings.rpcPort
+    const user = this.props.rpcSettings.rpcUsername
+    const pass = this.props.rpcSettings.rpcPassword
+    const timeout = 10000
+
+    // Reset addresses
+    this.setState({
+      addresses: []
+    })
+    
+    rpcCall(host, port, user, pass, timeout).cmd('getaddressesbyaccount',  '', function(err, resp, headers){
+      const newAddresses = this.state.addresses.concat(resp)
+
+      this.setState({
+        addresses: newAddresses
+      })
+    }.bind(this))
+
+    rpcCall(host, port, user, pass, timeout).cmd('z_listaddresses',  function(err, resp, headers){    
+      const newAddresses = this.state.addresses.concat(resp)
+
+      this.setState({
+        addresses: newAddresses
+      })    
+    }.bind(this))    
+  }
+
+  handleCheckRPCConnection () {
+    // RPC Call
+    const host = this.props.rpcSettings.rpcHost
+    const port = this.props.rpcSettings.rpcPort
+    const user = this.props.rpcSettings.rpcUsername
+    const pass = this.props.rpcSettings.rpcPassword
+    const timeout = 10000            
+    
+    rpcCall(host, port, user, pass, timeout).cmd('getinfo', function(err, resp, headers){        
+      if (err){
+        this.setState({
+          connectionEstablished: false,
+          connectionFailed: true
+        })
+      }
+      else{
+        this.setState({
+          connectionEstablished: true,
+          connectionFailed: false
+        })
+      }
+    }.bind(this))
   }
 
   handleNext () {
@@ -41,29 +103,12 @@ class StepperSetup extends Component {
     // Create a new RPC client and check connection settings
     // Check after first index
     // V stateful I know
-    if (stepIndex === 0){    
+    if (stepIndex === 0){
+      this.handleCheckRPCConnection()
+    }
 
-      // RPC Call
-      const host = this.props.rpcSettings.rpcHost
-      const port = this.props.rpcSettings.rpcPort
-      const user = this.props.rpcSettings.rpcUsername
-      const pass = this.props.rpcSettings.rpcPassword
-      const timeout = 10000            
-      
-      rpcCall(host, port, user, pass, timeout).cmd('getinfo', function(err, resp, headers){        
-        if (err){
-          this.setState({
-            connectionEstablished: false,
-            connectionFailed: true
-          })
-        }
-        else{
-          this.setState({
-            connectionEstablished: true,
-            connectionFailed: false
-          })
-        }
-      }.bind(this))
+    if (stepIndex === 1){
+      this.getAvailableAddresses()
     }
 
     // Finished, should change
@@ -81,8 +126,20 @@ class StepperSetup extends Component {
     }      
   };
 
+  handleSelectChange (event, index, value) {
+    this.setState({
+      selectedAddress: value
+    })
+    this.props.setSendAddress(value)
+  }
+
   handlePrev () {
     const {stepIndex} = this.state;
+
+    if (stepIndex == 2){
+      this.handleCheckRPCConnection()
+    }
+
     if (stepIndex > 0) {
       this.setState({
         stepIndex: stepIndex - 1,
@@ -162,15 +219,33 @@ class StepperSetup extends Component {
           </div>
         )
       case 2:
+        const addresses = this.state.addresses
+
         return (
-          <TextField
-            hintText="Leave blank for 'me'"
-            floatingLabelText="Your Nickname"
-            floatingLabelFixed={true}
-            fullWidth={true}
-            onChange={(e) => this.props.setUserNickname(e.target.value)}
-            value={this.props.userSettings.nickname}
-          />
+          <div>
+            <TextField
+              hintText="Leave blank for 'me'"
+              floatingLabelText="Nickname associated with the address below"
+              floatingLabelFixed={true}
+              fullWidth={true}
+              onChange={(e) => this.props.setUserNickname(e.target.value)}
+              value={this.props.userSettings.nickname}
+            />
+            
+            <SelectField
+              floatingLabelText="Address used to send messages"
+              value={this.state.selectedAddress}
+              onChange={this.handleSelectChange}
+              fullWidth={true}
+            >
+              {
+                addresses.map(function(x){
+                  console.log(x)
+                  return (<MenuItem value={x} primaryText={x} fullWidth={true}/>)
+                })
+              }
+            </SelectField>
+          </div>
         )
       default:
         return 'How did you get here!';
@@ -191,7 +266,7 @@ class StepperSetup extends Component {
             <StepLabel>RPC Connection Test</StepLabel>
           </Step>
           <Step>
-            <StepLabel>Nickname</StepLabel>
+            <StepLabel>Nickname and Address</StepLabel>
           </Step>
         </Stepper>
         <div style={contentStyle}>            
@@ -229,7 +304,8 @@ function matchDispatchToProps(dispatch){
     setRPCPassword,
     setRPCHost,
     setRPCPort,
-    setUserNickname
+    setUserNickname,
+    setSendAddress
   }, dispatch)
 }
 

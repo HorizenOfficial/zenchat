@@ -39,12 +39,16 @@ class ChatInfo extends React.Component {
 
   render () {
     const chat = this.props.chatList.filter((x) => x.address === this.props.chatContent.address)
-    var chatName    
+    var chatName, chatAddress, chatSecretCode
 
     if (chat.length === 0){
-      chatName = 'Select a room'
+      chatName = 'Welcome!'  
+      chatAddress = null
+      chatSecretCode = null
     } else {
       chatName = chat[0].chatName === '' ? chat[0].address : chat[0].chatName
+      chatAddress = chat[0].address
+      chatSecretCode = chat[0].secretCode
     }    
 
     return (
@@ -55,7 +59,7 @@ class ChatInfo extends React.Component {
           (chat.length > 0) ?
           (
             <div style={{width: '50px'}}>
-              <IconButton tooltip='room info' onClick={this.handleToggleDrawer}>
+              <IconButton tooltip='Chat Info' onClick={this.handleToggleDrawer}>
                 <InformationIconAsset/>
               </IconButton>
             </div>
@@ -69,7 +73,7 @@ class ChatInfo extends React.Component {
             open={this.state.drawerOpen}
             onRequestChange={this.handleCloseDrawer}>
             <List>
-              <ListItem style={{wordWrap: 'break-word'}} primaryText={<span>{chatName}</span>} rightIconButton={<span><DialogChatSettings/></span>} />
+              <ListItem style={{wordWrap: 'break-word'}} primaryText={<span>{chatName}</span>} rightIconButton={<span><DialogChatSettings secretCode={chatSecretCode} chatName={chatName} address={chatAddress}/></span>} />
             </List>
             <Subheader>
               Nicknames

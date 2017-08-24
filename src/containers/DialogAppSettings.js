@@ -8,6 +8,8 @@ import Dialog from 'material-ui/Dialog'
 import FlatButton from 'material-ui/FlatButton'
 import IconButton from 'material-ui/IconButton'
 import TextField from 'material-ui/TextField'
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 import {
   setRPCUsername,
@@ -15,7 +17,10 @@ import {
   setRPCHost,
   setRPCPort
 } from '../actions/RPCSettings'
-import { setUserNickname } from '../actions/UserSettings'
+
+import { setUserNickname, setSendAddress } from '../actions/UserSettings'
+
+import rpcCall from "../utils/rpc"
 
 import SettingsIconAsset
   from 'material-ui/svg-icons/action/settings-applications'
@@ -27,11 +32,45 @@ class SettingsDialog extends React.Component {
     this.handleDialogOpen = this.handleDialogOpen.bind(this)
     this.handleDialogClose = this.handleDialogClose.bind(this)
     this.state = {
-      dialogOpen: false      
+      dialogOpen: false,
+      addresses: [] 
     }
   }
 
+  // Gets available Z Addresses
+  getAvailableAddresses () {
+    const host = this.props.rpcSettings.rpcHost
+    const port = this.props.rpcSettings.rpcPort
+    const user = this.props.rpcSettings.rpcUsername
+    const pass = this.props.rpcSettings.rpcPassword
+    const timeout = 10000
+
+    // Reset addresses
+    this.setState({
+      addresses: []
+    })
+    
+    rpcCall(host, port, user, pass, timeout).cmd('getaddressesbyaccount',  '', function(err, resp, headers){
+      const newAddresses = this.state.addresses.concat(resp)
+
+      this.setState({
+        addresses: newAddresses
+      })
+    }.bind(this))
+
+    rpcCall(host, port, user, pass, timeout).cmd('z_listaddresses',  function(err, resp, headers){    
+      const newAddresses = this.state.addresses.concat(resp)
+
+      this.setState({
+        addresses: newAddresses
+      })    
+    }.bind(this))    
+  }
+
   handleDialogOpen () {
+    // Gets addresses b4 opening
+    this.getAvailableAddresses ()
+
     this.setState({
       dialogOpen: true
     })
@@ -44,6 +83,8 @@ class SettingsDialog extends React.Component {
   }
 
   render () {
+    const addresses = this.state.addresses
+
     const actions = [
       <FlatButton label='Done' primary onClick={this.handleDialogClose} />
     ]
@@ -66,13 +107,26 @@ class SettingsDialog extends React.Component {
               <Col xs={6}>
                 <TextField
                   hintText='Me'
-                  floatingLabelText='Nickname'
+                  floatingLabelText='Nickname associated with the address below'
                   floatingLabelFixed={true}
                   fullWidth={true}
                   onChange={(e) => this.props.setUserNickname(e.target.value)}
                   value={this.props.userSettings.nickname}
                 />
                 <br />
+                <SelectField
+                  floatingLabelText="Address used to send messages"
+                  value={this.props.userSettings.address}
+                  onChange={(e, i, v) => this.props.setSendAddress(v)}
+                  fullWidth={true}
+                >
+                  {
+                    addresses.map(function(x){
+                      console.log(x)
+                      return (<MenuItem value={x} primaryText={x} fullWidth={true}/>)
+                    })
+                  }
+                </SelectField>
               </Col>
               <Col xs={6}>
                 <TextField
@@ -135,7 +189,8 @@ function matchDispatchToProps (dispatch) {
       setRPCPassword,
       setRPCHost,
       setRPCPort,
-      setUserNickname
+      setUserNickname,
+      setSendAddress
     },
     dispatch
   )

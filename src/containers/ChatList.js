@@ -84,14 +84,15 @@ class CheckRPCConnection extends Component {
 
 class ChatListItem extends Component {
   render () {
-    const chatName = this.props.chatName === '' ? this.props.address : this.props.chatName    
+    const chatName = this.props.chatName === '' ? this.props.address : this.props.chatName
+
     return (
       <ListItem
-        style={this.props.selected ? {backgroundColor: '#ecf0f1'} : null }
+        style={this.props.selected ? {backgroundColor: "rgba(236, 240, 241, 255)"} : null }
         onClick={() => this.props.selectChatContent(this.props.address)}
         secondaryText={<p><span style={{color: darkBlack}}>{chatName}</span><br /></p>}
         secondaryTextLines={2}
-        rightIconButton={<span><DialogChatSettings {...this.props}/></span>}
+        rightIconButton={<span><DialogChatSettings secretCode={this.props.secretCode} chatName={chatName} address={this.props.address}/></span>}
       />
     )
   }
@@ -116,7 +117,7 @@ class ChatList extends Component {
               this.props.chatList.map(function(chat){
                 return (
                   <div>
-                    <ChatListItem
+                    <ChatListItem                      
                       {...chat}
                       selectChatContent={this.props.selectChatContent}
                       selected={this.props.chatContent.address === chat.address}

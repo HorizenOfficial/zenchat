@@ -33,14 +33,16 @@ function deterministicReadFile(){
  * {
  *   secretCode: secretCode,
  *   chatName: chatName,
- *   address: address   
+ *   address: address,
+ *   nicknames: {
+ *       'zaddress': 'nickname'
+ *   }
  * }
  */
 var initialChats = deterministicReadFile()
 
 export default function ChatListReducer(state=initialChats, action){  
-  switch (action.type) {
-    // TODO: RPC CALL and sync
+  switch (action.type) {    
     // Save settings to file
     case NEW_CHAT:
       // Don't add the same secret code
@@ -68,9 +70,7 @@ export default function ChatListReducer(state=initialChats, action){
         return obj
       })
 
-    case DELETE_CHAT:
-      console.log(state)
-      console.log(state.filter((x) => x.address !== action.address))
+    case DELETE_CHAT:      
       return state.filter((x) => x.address !== action.address)
 
     default:

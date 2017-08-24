@@ -15,7 +15,7 @@ import CommunicationChatBubble from 'material-ui/svg-icons/communication/chat-bu
 import '../assets/scss/main.scss'
 
 import rpcCall from '../utils/rpc'
-import { secretCodeToWIFKey } from '../utils/zaddress'
+import { secretCodeToWIFKey, secretCodeToZAddr } from '../utils/zaddress'
 
 class DialogNewChat extends React.Component {
   constructor(props){
@@ -82,7 +82,7 @@ class DialogNewChat extends React.Component {
     this.setState({ dialogOpen: false })
   }
 
-  render() {
+  render() {    
     const actions = [
       <FlatButton
         label='Ok'
@@ -129,7 +129,14 @@ class DialogNewChat extends React.Component {
           open={this.state.dialogSyncOpen}
         >
           <div style={{textAlign: 'center'}}>
-            <CircularProgress size={75}/><br/><br/>
+            <CircularProgress size={75}/><br/><br/>            
+            <span className="spanAlert">
+              Do <strong>NOT</strong> send any personal funds to the address <br/><br/>
+              <span style={{wordWrap: 'break-word'}}>
+                <strong>{secretCodeToZAddr(this.state.tempSecretCode)}</strong>
+              </span> <br/><br/>
+              It can and will be compromised. <br/><br/>
+            </span>
             <span>Rescanning blockchain, dialog will automatically close upon completion. Do NOT close your daemon. Takes ~5 - 10 minutes.</span>
           </div>          
         </Dialog>

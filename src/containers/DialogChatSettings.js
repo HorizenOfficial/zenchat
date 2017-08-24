@@ -25,7 +25,7 @@ import { addNewChat, setChatName, deleteChat } from '../actions/ChatSettings'
 import "../assets/scss/main.scss"
 
 const iconButtonElement = (
-<IconButton touch={true} tooltip='more' tooltipPosition='bottom-left'>
+<IconButton touch={true} tooltip='more' tooltipPosition='bottom-left' >
   <MoreVertIcon color={grey400} />
 </IconButton>
 )
@@ -111,12 +111,12 @@ class ChatSettings extends React.Component {
     return (
       <div>
         <Dialog
-          title='Set Chat Name'
+          title='Rename Chat'
           actions={renameActions}
           modal={false}
           open={this.state.renameDialogOpen}>
           <TextField
-            hintText='Core Devs for Eagle Hawk'
+            hintText='Operation Eagle Hawk 917'
             floatingLabelText='Chat Name'
             floatingLabelFixed={true}
             fullWidth={true} 
@@ -131,15 +131,15 @@ class ChatSettings extends React.Component {
           modal={false}
           open={this.state.copyDialogOpen}>
           <span className="spanAlert">Anyone who has access to the secret code has access to the following address:</span><br/><br/>
-          {this.props.address}<br/>
-          Amount: 0.01 ZEN
+          {this.props.address}          
         </Dialog>
         <Dialog
           title='Are you sure you want to delete this chat?'
           actions={deleteActions}
           modal={false}
           open={this.state.deleteDialogOpen}>
-          <span className="spanAlert">If you don't have the secret code to the chat, it'll be lost <strong>forever</strong></span><br/><br/>                    
+          <h3 style={{textAlign: 'center'}}>{this.props.chatName}</h3><br/>
+          <span className="spanAlert">If you don't have the secret code to this chat, it'll be lost <strong>forever</strong></span><br/><br/>                    
         </Dialog>
         <Snackbar
           open={this.state.snackbarOpen}

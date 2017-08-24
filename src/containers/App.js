@@ -9,7 +9,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { setRPCUsername, setRPCPassword, setRPCHost, setRPCPort } from '../actions/RPCSettings'
-import { setUserNickname } from '../actions/UserSettings'
+import { setUserNickname, setSendAddress } from '../actions/UserSettings'
 
 import { FOLDER_NAME, FOLDER_LOCATION, CONFIG_FILENAME, CONFIG_FILE_LOCATION } from '../constants/storage'
 
@@ -46,29 +46,42 @@ class App extends Component {
         return
       }
 
-      // If we can parse the file,
-      // it most likely saved the settings
       try{
         const _settings = JSON.parse(data)
-        
-        // Set the settings
-        this.props.setRPCHost(_settings.rpcSettings.rpcHost)
-        this.props.setRPCPort(_settings.rpcSettings.rpcPort)
-        this.props.setRPCUsername(_settings.rpcSettings.rpcUsername)
-        this.props.setRPCPassword(_settings.rpcSettings.rpcPassword)
-        this.props.setUserNickname(_settings.userSettings.nickname)
+        console.log(_settings)
 
-        // Set configured
-        this.setState({
-          configured: true
-        })
-        return
-      } catch(err){ console.log(err) }      
+        if (_settings.rpcSettings.rpcHost === '' ||
+            _settings.rpcSettings.rpcPort === '' ||
+            _settings.rpcSettings.rpcUsername === '' ||
+            _settings.rpcSettings.rpcUsername === '' ||
+            _settings.userSettings.rpcPassword === '' ||
+            _settings.userSettings.address === ''){
+              this.setState({
+                configured: false
+              })
+            }
+        
+        else {
+          // Set the settings
+          this.props.setRPCHost(_settings.rpcSettings.rpcHost)
+          this.props.setRPCPort(_settings.rpcSettings.rpcPort)
+          this.props.setRPCUsername(_settings.rpcSettings.rpcUsername)
+          this.props.setRPCPassword(_settings.rpcSettings.rpcPassword)
+          this.props.setUserNickname(_settings.userSettings.nickname)
+          this.props.setSendAddress(_settings.userSettings.address)
+
+          // Set configured
+          this.setState({
+            configured: true
+          })
+          return
+        }  
+      }  catch(err){ console.log(err) }   
 
       this.setState({
         configured: false
       })
-    }.bind(this))
+    }.bind(this))    
   }
 
   // Checks if zenchat is configured
@@ -122,7 +135,8 @@ function matchDispatchToProps(dispatch){
     setRPCPassword,
     setRPCHost,
     setRPCPort,
-    setUserNickname
+    setUserNickname,
+    setSendAddress
   }, dispatch)
 }
 
