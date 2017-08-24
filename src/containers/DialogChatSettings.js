@@ -108,7 +108,7 @@ class ChatSettings extends React.Component {
       <FlatButton label='Cancel' primary={true} onClick={this.handleDeleteDialogClose} />
     ]
 
-    return (
+    return (          
       <div>
         <Dialog
           title='Rename Chat'
@@ -146,7 +146,7 @@ class ChatSettings extends React.Component {
           message='Secret code copied to clipboard'
           autoHideDuration={4000}
           onRequestClose={this.handleSnackbarClose} />
-        <IconMenu iconButtonElement={iconButtonElement}>
+        <IconMenu iconButtonElement={iconButtonElement}>        
           <MenuItem onClick={this.handleRenameDialogOpen}> Rename Chat
           </MenuItem>
           <MenuItem onClick={this.handleCopyDialogOpen}> Get Secret Code
@@ -154,7 +154,7 @@ class ChatSettings extends React.Component {
           <MenuItem onClick={this.handleDeleteDialogOpen}> Delete Chat
           </MenuItem>
         </IconMenu>
-      </div>
+      </div>  
     )
   }
 }
@@ -170,7 +170,7 @@ function matchDispatchToProps (dispatch) {
     {
       addNewChat,
       setChatName,
-      deleteChat
+      deleteChat      
     },
     dispatch
   )

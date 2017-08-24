@@ -88,7 +88,6 @@ class ChatListItem extends Component {
 
     return (
       <ListItem
-        style={this.props.selected ? {backgroundColor: "rgba(236, 240, 241, 255)"} : null }
         onClick={() => this.props.selectChatContent(this.props.address)}
         secondaryText={<p><span style={{color: darkBlack}}>{chatName}</span><br /></p>}
         secondaryTextLines={2}
@@ -99,6 +98,14 @@ class ChatListItem extends Component {
 }
 
 class ChatList extends Component {
+  shouldComponentUpdate(nextProps, nextState){
+    // Update if items are different
+    if (JSON.stringify(nextProps.chatList) !== JSON.stringify(this.props.chatList)){
+      return true;
+    }
+    return true
+  }
+
   render () {    
     return (
       <div style={{height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden'}}>
@@ -114,13 +121,12 @@ class ChatList extends Component {
         <div style={{flex: 1, overflowY: 'auto'}}>
           <List>
             {
-              this.props.chatList.map(function(chat){
+              this.props.chatList.map(function(chat, i){
                 return (
-                  <div>
+                  <div key={i}>
                     <ChatListItem                      
                       {...chat}
-                      selectChatContent={this.props.selectChatContent}
-                      selected={this.props.chatContent.address === chat.address}
+                      selectChatContent={this.props.selectChatContent}                      
                     />
                     <Divider/>
                   </div>

@@ -32,8 +32,7 @@ export default class SetNicknameDialog extends React.Component {
     })
   }
 
-  render() {    
-    console.log(this.props.nicknames)
+  render() {        
     const nickname = this.props.nicknames === undefined ? '' : (this.props.nicknames[this.props.senderAddress] || '')
 
     const actions = [

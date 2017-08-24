@@ -2,6 +2,7 @@ export const SET_RPC_USERNAME = 'SET_RPC_USERNAME'
 export const SET_RPC_PASSWORD = 'SET_RPC_PASSWORD'
 export const SET_RPC_HOST = 'SET_RPC_HOST'
 export const SET_RPC_PORT = 'SET_RPC_PORT'
+export const SET_RPC_SETTINGS = 'SET_RPC_SETTINGS'
 
 export function setRPCUsername (rpcUsername) {
   return {
@@ -32,5 +33,12 @@ export function setRPCPort (rpcPort) {
   return {
     type: SET_RPC_PORT,
     rpcPort: isNaN(intRpcPort) ? '' : intRpcPort
+  }
+}
+
+export function setRPCSettings (rpcSettings) {
+  return {
+    type: SET_RPC_SETTINGS,
+    rpcSettings
   }
 }

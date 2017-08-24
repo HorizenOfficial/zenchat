@@ -2,7 +2,8 @@ import {
   SET_RPC_HOST,
   SET_RPC_PASSWORD,
   SET_RPC_USERNAME,
-  SET_RPC_PORT  
+  SET_RPC_PORT,
+  SET_RPC_SETTINGS
 } from '../actions/RPCSettings'
 
 const initialRPCSettings = {
@@ -25,6 +26,9 @@ export default function RPCSettingsReducer (state=initialRPCSettings, action) {
 
     case SET_RPC_PASSWORD:
       return Object.assign({}, state, {rpcPassword: action.rpcPassword})
+
+    case SET_RPC_SETTINGS:
+      return action.rpcSettings
 
     default:
       return state

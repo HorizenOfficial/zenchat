@@ -8,8 +8,8 @@ import StepperSetup from './StepperSetup'
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import { setRPCUsername, setRPCPassword, setRPCHost, setRPCPort } from '../actions/RPCSettings'
-import { setUserNickname, setSendAddress } from '../actions/UserSettings'
+import { setRPCUsername, setRPCPassword, setRPCHost, setRPCPort, setRPCSettings } from '../actions/RPCSettings'
+import { setUserNickname, setSendAddress, setUserSettings } from '../actions/UserSettings'
 
 import { FOLDER_NAME, FOLDER_LOCATION, CONFIG_FILENAME, CONFIG_FILE_LOCATION } from '../constants/storage'
 
@@ -62,12 +62,8 @@ class App extends Component {
         
         else {
           // Set the settings
-          this.props.setRPCHost(_settings.rpcSettings.rpcHost)
-          this.props.setRPCPort(_settings.rpcSettings.rpcPort)
-          this.props.setRPCUsername(_settings.rpcSettings.rpcUsername)
-          this.props.setRPCPassword(_settings.rpcSettings.rpcPassword)
-          this.props.setUserNickname(_settings.userSettings.nickname)
-          this.props.setSendAddress(_settings.userSettings.address)
+          this.props.setRPCSettings(_settings.rpcSettings)
+          this.props.setUserSettings(_settings.userSettings)
 
           // Set configured
           this.setState({
@@ -135,7 +131,9 @@ function matchDispatchToProps(dispatch){
     setRPCHost,
     setRPCPort,
     setUserNickname,
-    setSendAddress
+    setSendAddress,
+    setRPCSettings,
+    setUserSettings
   }, dispatch)
 }
 

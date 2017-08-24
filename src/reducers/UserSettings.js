@@ -1,4 +1,4 @@
-import { SET_USER_NICKNAME, SET_SEND_ADDRESS } from '../actions/UserSettings'
+import { SET_USER_NICKNAME, SET_SEND_ADDRESS, SET_USER_SETTINGS } from '../actions/UserSettings'
 
 
 const initialUserSettings = {
@@ -17,6 +17,9 @@ export default function UserSettingsReducer (state=initialUserSettings, action){
       return Object.assign({}, state, {
         address: action.address
       })
+
+    case SET_USER_SETTINGS:
+      return action.userSettings
     
     default:
       return state

@@ -83,15 +83,16 @@ class ChatInfo extends React.Component {
             </Subheader>
             <List>
               {
-                this.props.chatContent.senderAddress.map(function(x){
-                  console.log(this.props.chatList)
+                this.props.chatContent.senderAddress.map(function(x, i){                  
                   return (
-                    <DialogSetNickname
-                      senderAddress={x}
-                      nicknames={chatNicknames}                      
-                      chatAddress={this.props.chatContent.address}                      
-                      setAddressNickname={this.props.setAddressNickname}
-                    />
+                    <div key={i}>
+                      <DialogSetNickname
+                        senderAddress={x}
+                        nicknames={chatNicknames}                      
+                        chatAddress={this.props.chatContent.address}                      
+                        setAddressNickname={this.props.setAddressNickname}
+                      />
+                    </div>
                   )
                 }.bind(this))
               }
