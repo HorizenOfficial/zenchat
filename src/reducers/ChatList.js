@@ -1,7 +1,8 @@
 import {
   NEW_CHAT,
   SET_CHAT_NAME,
-  DELETE_CHAT
+  DELETE_CHAT,
+  SET_ADDRESS_NICKNAME
 } from '../actions/ChatSettings'
 
 import { secretCodeToZAddr, secretCodeToWIFKey } from '../utils/zaddress'
@@ -41,6 +42,18 @@ function deterministicReadFile(){
  */
 var initialChats = deterministicReadFile()
 
+function ChatNickamesReducer(state={}, action){
+  switch (action.type) {
+    case SET_ADDRESS_NICKNAME:
+      var v = {}
+      v[action.senderAddress] = action.nickname
+      return Object.assign({}, state, v)
+
+    default:
+      return state
+  }
+}
+
 export default function ChatListReducer(state=initialChats, action){  
   switch (action.type) {    
     // Save settings to file
@@ -54,7 +67,8 @@ export default function ChatListReducer(state=initialChats, action){
         {
           secretCode: action.secretCode,
           chatName: '',
-          address: secretCodeToZAddr(action.secretCode)
+          address: secretCodeToZAddr(action.secretCode),
+          nicknames: ChatNickamesReducer({}, action)
         }
       ]
     
@@ -64,8 +78,19 @@ export default function ChatListReducer(state=initialChats, action){
           return {
             secretCode: obj.secretCode,
             chatName: action.chatName,
-            address: action.address
+            address: action.address,
+            nicknames: ChatNickamesReducer(obj.nicknames, action)
           }
+        }
+        return obj
+      })
+
+    case SET_ADDRESS_NICKNAME:
+      return state.map(function(obj){
+        if (obj.address === action.chatAddress) {
+          return Object.assign({}, obj, {
+            nicknames: ChatNickamesReducer(obj.nicknames, action)
+          })
         }
         return obj
       })

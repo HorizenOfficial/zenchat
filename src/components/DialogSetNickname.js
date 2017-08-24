@@ -15,7 +15,8 @@ export default class SetNicknameDialog extends React.Component {
     this.handleDialogOpen = this.handleDialogOpen.bind(this)
     this.handleDialogClose = this.handleDialogClose.bind(this)
     this.state = {
-      dialogOpen: false
+      dialogOpen: false,      
+      tempNickname: ''
     }
   }
 
@@ -31,12 +32,18 @@ export default class SetNicknameDialog extends React.Component {
     })
   }
 
-  render() {
+  render() {    
+    console.log(this.props.nicknames)
+    const nickname = this.props.nicknames === undefined ? '' : (this.props.nicknames[this.props.senderAddress] || '')
+
     const actions = [
       <FlatButton
         label="Ok"
         primary={true}        
-        onClick={this.handleDialogClose}
+        onClick={() => {          
+          this.props.setAddressNickname(this.props.chatAddress, this.props.senderAddress, this.state.tempNickname);
+          this.handleDialogClose();
+        }}
       />,
       <FlatButton
         label="Cancel"
@@ -48,8 +55,8 @@ export default class SetNicknameDialog extends React.Component {
     return (
       <span>
         <ListItem onClick={this.handleDialogOpen}
-          primaryText={<span>znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf</span>}
-          secondaryText="Potatoes are nice"
+          primaryText={<span>{this.props.senderAddress}</span>}
+          secondaryText={nickname}
         />
         <Dialog
           title="Set Your Nickname"
@@ -60,9 +67,12 @@ export default class SetNicknameDialog extends React.Component {
         >          
           <TextField
             hintText="Nickname"
-            floatingLabelText="znkz4JE6Y4m8xWoo4ryTnpxwBT5F7vFDgNf"
+            floatingLabelText={this.props.senderAddress}
+            defaultValue={this.state.tempNickname}
             floatingLabelFixed={true}
             fullWidth={true}
+            defaultValue={nickname}
+            onChange={(e) => this.setState({tempNickname: e.target.value})}
           /><br />      
         </Dialog>        
       </span>

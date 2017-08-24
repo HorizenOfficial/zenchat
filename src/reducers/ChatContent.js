@@ -1,15 +1,26 @@
-import { SELECT_CHAT_CONTENT } from '../actions/ChatContent'
+import { SELECT_CHAT_CONTENT, ADD_SENDER_ADDRESS } from '../actions/ChatContent'
 
 var initialChatContent = {
-  address: ''  
+  address: '',
+  senderAddress: []  
 }
 
 export default function ChatContentReducer (state=initialChatContent, action) {
   switch(action.type){
     case SELECT_CHAT_CONTENT:
       return {
-        address: action.address
+        address: action.address,
+        senderAddress: []
       }
+
+    case ADD_SENDER_ADDRESS:      
+      const addresses = state.senderAddress.concat(action.senderAddress)
+      const uniqueAddresses = addresses.filter(function(item, pos){
+        return addresses.indexOf(item) === pos
+      })      
+      return Object.assign({}, state, {
+        senderAddress: uniqueAddresses
+      })
     
     default:
       return state

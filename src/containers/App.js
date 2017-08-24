@@ -47,8 +47,7 @@ class App extends Component {
       }
 
       try{
-        const _settings = JSON.parse(data)
-        console.log(_settings)
+        const _settings = JSON.parse(data)        
 
         if (_settings.rpcSettings.rpcHost === '' ||
             _settings.rpcSettings.rpcPort === '' ||
@@ -76,7 +75,7 @@ class App extends Component {
           })
           return
         }  
-      }  catch(err){ console.log(err) }   
+      }  catch(err){ alert(err) }   
 
       this.setState({
         configured: false

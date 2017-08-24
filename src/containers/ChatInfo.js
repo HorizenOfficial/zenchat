@@ -11,7 +11,7 @@ import Subheader from 'material-ui/Subheader'
 import DialogChatSettings from './DialogChatSettings'
 import DialogSetNickname from '../components/DialogSetNickname'
 
-import { setChatName } from '../actions/ChatSettings'
+import { setChatName, setAddressNickname } from '../actions/ChatSettings'
 
 import InformationIconAsset from 'material-ui/svg-icons/action/info'
 
@@ -38,17 +38,20 @@ class ChatInfo extends React.Component {
   }
 
   render () {
+    // Chat info
     const chat = this.props.chatList.filter((x) => x.address === this.props.chatContent.address)
-    var chatName, chatAddress, chatSecretCode
+    var chatName, chatAddress, chatSecretCode, chatNicknames
 
     if (chat.length === 0){
       chatName = 'Welcome!'  
       chatAddress = null
       chatSecretCode = null
+      chatNicknames = []
     } else {
       chatName = chat[0].chatName === '' ? chat[0].address : chat[0].chatName
       chatAddress = chat[0].address
-      chatSecretCode = chat[0].secretCode
+      chatSecretCode = chat[0].secretCode   
+      chatNicknames = chat[0].nicknames   
     }    
 
     return (
@@ -79,9 +82,19 @@ class ChatInfo extends React.Component {
               Nicknames
             </Subheader>
             <List>
-              <DialogSetNickname/>
-              <DialogSetNickname/>
-              <DialogSetNickname/>
+              {
+                this.props.chatContent.senderAddress.map(function(x){
+                  console.log(this.props.chatList)
+                  return (
+                    <DialogSetNickname
+                      senderAddress={x}
+                      nicknames={chatNicknames}                      
+                      chatAddress={this.props.chatContent.address}                      
+                      setAddressNickname={this.props.setAddressNickname}
+                    />
+                  )
+                }.bind(this))
+              }
             </List>
           </Drawer>
       </div>
@@ -99,6 +112,7 @@ function mapStateToProps (state) {
 function matchDispatchToProps (dispatch) {
   return bindActionCreators(
     {      
+      setAddressNickname,
     },
     dispatch
   )

@@ -240,7 +240,6 @@ class StepperSetup extends Component {
             >
               {
                 addresses.map(function(x){
-                  console.log(x)
                   return (<MenuItem value={x} primaryText={x} fullWidth={true}/>)
                 })
               }

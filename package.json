@@ -47,6 +47,7 @@
     "redux": "^3.7.2",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
+    "utf8": "^2.1.2",
     "webpack": "^2.5.1",
     "webpack-dev-server": "^2.4.5",
     "zencashjs": "^1.1.4-a"

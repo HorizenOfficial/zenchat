@@ -121,8 +121,7 @@ class SettingsDialog extends React.Component {
                   fullWidth={true}
                 >
                   {
-                    addresses.map(function(x){
-                      console.log(x)
+                    addresses.map(function(x){                      
                       return (<MenuItem value={x} primaryText={x} fullWidth={true}/>)
                     })
                   }
