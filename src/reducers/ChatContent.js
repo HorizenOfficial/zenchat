@@ -16,7 +16,7 @@ export default function ChatContentReducer (state=initialChatContent, action) {
     case ADD_SENDER_ADDRESS:      
       const addresses = state.senderAddress.concat(action.senderAddress)
       const uniqueAddresses = addresses.filter(function(item, pos){
-        return addresses.indexOf(item) === pos
+        return (addresses.indexOf(item) === pos)
       })      
       return Object.assign({}, state, {
         senderAddress: uniqueAddresses

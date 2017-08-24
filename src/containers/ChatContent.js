@@ -53,8 +53,13 @@ class ChatContentItem extends Component {
         throw "invalid zenmsg"
       }
 
-      // Convert address to nickname (if exist)
-      const addrDisplay = this.props.nicknames[zenmsg.from] || zenmsg.from      
+      // Convert address to nickname (if exist)      
+      var addrDisplay = this.props.nicknames[zenmsg.from] || zenmsg.from
+
+      // Sender address
+      if (addrDisplay === this.props.userSettings.address){        
+        addrDisplay = this.props.userSettings.nickname        
+      }      
 
       this.setState({
         isValid: true,
@@ -80,7 +85,7 @@ class ChatContentItem extends Component {
     rpcCall(host, port, user, pass).cmd('verifymessage', zenmsg.from, zenmsg.sign, encodedMsg, function(err, resp, headers){
       // If is valid sender
       // TODO CHANGE BACK TO RESP
-      if(true){
+      if(true){        
         this.props.addSenderAddress(zenmsg.from)        
       }
       this.setState({
@@ -153,6 +158,7 @@ class ChatContent extends Component {
                 return (
                   <ChatContentItem 
                     data={x}
+                    userSettings={this.props.userSettings}
                     rpcSettings={this.props.rpcSettings}
                     addSenderAddress={this.props.addSenderAddress}
                     nicknames={chatNicknames}
@@ -172,7 +178,8 @@ function mapStateToProps (state) {
   return {
     chatList: state.chatList,    
     chatContent: state.chatContent,
-    rpcSettings: state.rpcSettings
+    rpcSettings: state.rpcSettings,
+    userSettings: state.userSettings
   }
 }
 
