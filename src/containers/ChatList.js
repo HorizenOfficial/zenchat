@@ -145,8 +145,7 @@ class ChatList extends Component {
 }
 
 function mapStateToProps (state) {  
-  return {
-    chatContent: state.chatContent,
+  return {    
     chatList: state.chatList,
     rpcSettings: state.rpcSettings
   }

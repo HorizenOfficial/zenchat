@@ -71,7 +71,7 @@ class ChatContentOperationItem extends Component {
           })
         }
       } catch(err){
-        console.log(err)
+        alert(err)
       }
     }.bind(this))
   }
@@ -97,7 +97,7 @@ class ChatContentOperationItem extends Component {
     })
   }
 
-  render () {          
+  render () {        
     return (
       <ListItem
           rightIcon={
@@ -126,15 +126,43 @@ class ChatContentItem extends Component {
     super(props)
 
     this.state = {
-      isValid: false,  // is this a valid memo (needs to adhere with ZEN messaging protocol)
-      isVerified: true, // is the message verified by the t-addr?      
+      isValid: false,  // is this a valid memo (needs to adhere with ZEN messaging protocol)      
+      isVerified: true, // is the message verified by the `verifymessage`?
+      hasAttempted: false, // have we tried to convert it into a zenmsg obj and verify it?
       from: '', // Who is the message from (nickname || address)
       message: '', // what does hte message contain
       address: '', // Who is the message from (address always)
     }
+
+    this.getMessageInfo = this.getMessageInfo.bind(this)
   }
 
-  componentWillReceiveProps(nextProps){
+  shouldComponentUpdate(nextProps, nextState){    
+    // Only re-render valid messages
+    if (nextState.isValid){
+      // For the valid messages
+      // only rerender if there is a change
+      const sameIsVerified = this.state.isVerified === nextState.isVerified      
+      const sameFrom = this.state.from === nextState.from
+      const sameMessage = this.state.message === nextState.message
+      const sameAddress = this.state.address === nextState.addresss
+
+      if (sameIsVerified && sameFrom && sameMessage && sameAddress){
+        return false
+      }      
+      
+      // If they're different then render them
+      return true
+    }
+
+    return false
+  }
+
+  componentDidMount(){    
+    this.getMessageInfo(this.props)   
+  }
+
+  componentWillReceiveProps(nextProps){    
     // Update nickname
     // Convert address to nickname (if exist)      
     var addrDisplay = nextProps.nicknames[this.state.address] || this.state.from
@@ -149,13 +177,14 @@ class ChatContentItem extends Component {
     })
   }
 
-  componentDidMount(){    
-    var zenmsg
-
+  // Converts memo into a zenmsg object
+  getMessageInfo(props){
+    var zenmsg, addrDisplay
+    
     // ZEN Messaging Protocol v1
     // Need to put this into another file soon
     try {            
-      var obj = JSON.parse(hexToString(this.props.data.memo))
+      var obj = JSON.parse(hexToString(props.data.memo))
       
       if (obj.zenmsg === undefined)
         throw "invalid zenmsg"
@@ -170,55 +199,54 @@ class ChatContentItem extends Component {
       }      
 
       // Convert address to nickname (if exist)      
-      var addrDisplay = this.props.nicknames[zenmsg.from] || zenmsg.from
+      addrDisplay = props.nicknames[zenmsg.from] || zenmsg.from
 
       // Sender address
-      if (addrDisplay === this.props.userSettings.address){        
-        addrDisplay = this.props.userSettings.nickname        
-      }      
-
+      if (addrDisplay === props.userSettings.address){        
+        addrDisplay = props.userSettings.nickname        
+      }            
+    } catch (err) {
       this.setState({
-        isValid: true,
-        from: addrDisplay,
-        message: zenmsg.message,
-        address: zenmsg.from      
-      })      
-    } catch (err) {      
-      this.setState({
-        isValid: false
+        hasAttempted: true
       })
       return
     }
 
-    const host = this.props.rpcSettings.rpcHost
-    const port = this.props.rpcSettings.rpcPort
-    const user = this.props.rpcSettings.rpcUsername
-    const pass = this.props.rpcSettings.rpcPassword
+    const host = props.rpcSettings.rpcHost
+    const port = props.rpcSettings.rpcPort
+    const user = props.rpcSettings.rpcUsername
+    const pass = props.rpcSettings.rpcPassword
 
     // Convert msg to utf, and to hex and to uppercase before signed
     // need to do the same to verify
     const encodedMsg = stringToHex(zenmsg.message).toUpperCase()
 
-    rpcCall(host, port, user, pass).cmd('verifymessage', zenmsg.from, zenmsg.sign, encodedMsg, function(err, resp, headers){
-      // If is valid sender
-      // TODO CHANGE BACK TO RESP      
-      if(true){        
-        this.props.addSenderAddress(zenmsg.from)        
-      }
-      
+    rpcCall(host, port, user, pass).cmd('verifymessage', zenmsg.from, zenmsg.sign, encodedMsg, function(err, resp, headers){      
+      if(resp){
+        props.addSenderAddress(zenmsg.from)
+      }      
       this.setState({
-        isVerified: resp
-      })     
+        isValid: true,
+        hasAttempted: true,
+        isVerified: resp,
+        from: addrDisplay,
+        message: zenmsg.message,
+        address: zenmsg.from      
+      })
     }.bind(this))
   }
-
-  render () {    
-    if (this.state.isValid) {      
+  
+  render () {
+    if (this.state.isValid && this.state.hasAttempted) {       
       return (
         <ListItem rightIcon={
-            this.state.isVerified ?
-            <CheckCircleIconAsset color={green500}/> :
-            <div><ProblemIconAsset color={red500}/></div>
+            this.state.hasAttempted ?
+            (
+              this.state.isVerified ?
+              <CheckCircleIconAsset color={green500}/> :
+              <ProblemIconAsset color={red500}/>
+            ) :
+            <CircularProgress size={16}/>
         }>
           <p>
             <span className="chatMessageSender">{this.state.from}</span>
@@ -246,25 +274,72 @@ class ChatContent extends Component {
     this.addOperation = this.addOperation.bind(this)
     this.removeOperation = this.removeOperation.bind(this)
     this.updateContentData = this.updateContentData.bind(this)
+    this.getChatNicknames = this.getChatNicknames.bind(this) 
+  }
+
+  shouldComponentUpdate(nextProps, nextState){
+    if (nextProps.chatContent.address === this.props.chatContent.address){
+      // Only thing that is of concern if we get the same address
+      // twice and need to update are if either one of the
+      // userSettings, rpcSettings, chatList, and the contentData, and operations changed     
+      const sameRPCSettings = JSON.stringify(nextProps.userSettings) === JSON.stringify(this.props.userSettings)
+      const sameUserSettings = JSON.stringify(nextProps.rpcSettings) === JSON.stringify(this.props.rpcSettings)
+      const sameChatlist = JSON.stringify(nextProps.chatList) === JSON.stringify(this.props.chatList)
+
+      const sameContentData = nextState.contentData.length === this.state.contentData.length
+      const sameOperations = nextState.operations.length === this.state.operations.length
+
+      if (sameRPCSettings && sameUserSettings && sameChatlist && sameContentData && sameOperations){        
+        return false
+      }      
+    }
+
+    return true;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.chatContent.address !== nextProps.chatContent.address){
+      this.setState({
+        contentData: []
+      })
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    this.updateContentData()
+    // Only re-get chatcontent item if
+    // the address aren't similar
+    if (prevProps.chatContent.address !== this.props.chatContent.address){      
+      this.updateContentData(this.props)
+      this.getChatNicknames(this.props)
+    }
   }
 
-  updateContentData() {
-    const host = this.props.rpcSettings.rpcHost
-    const port = this.props.rpcSettings.rpcPort
-    const user = this.props.rpcSettings.rpcUsername
-    const pass = this.props.rpcSettings.rpcPassword
+  updateContentData(props) {
+    const host = props.rpcSettings.rpcHost
+    const port = props.rpcSettings.rpcPort
+    const user = props.rpcSettings.rpcUsername
+    const pass = props.rpcSettings.rpcPassword
 
-    const address = this.props.chatContent.address    
+    const address = props.chatContent.address    
 
     rpcCall(host, port, user, pass, 10000).cmd('z_listreceivedbyaddress', address, 0, function(err, resp=[], header){      
       this.setState({
         contentData: resp.reverse()
       })
     }.bind(this))
+  }
+
+  getChatNicknames(props){
+    const chat = props.chatList.filter((x) => x.address === props.chatContent.address)
+    var chatNicknames = {}
+
+    if (chat.length > 0){      
+      chatNicknames = chat[0].nicknames
+    }
+
+    this.setState({
+      chatNicknames: chatNicknames
+    })
   }
 
   addOperation(opObj) {
@@ -280,23 +355,18 @@ class ChatContent extends Component {
 
     this.setState({
       operations: ops.filter((x) => x.opid !== opid)
-    }) 
+    }, this.updateContentData(this.props)) 
   }
 
   render () {    
-    const chat = this.props.chatList.filter((x) => x.address === this.props.chatContent.address)
-    var chatNicknames = {}
-
-    if (chat.length > 0){      
-      chatNicknames = chat[0].nicknames
-    }    
-
     return (
       <div className='chatContainerStyle'>
         <ChatInfo/>
-        <div className='chatAreaStyle'>
+        <div className='chatAreaStyle'>        
           <List>
             {
+              this.state.contentData.length == 0 ?
+              null :
               this.state.contentData.map((x, i) => {
                 return (
                   <div key={i}>
@@ -305,13 +375,15 @@ class ChatContent extends Component {
                       userSettings={this.props.userSettings}
                       rpcSettings={this.props.rpcSettings}
                       addSenderAddress={this.props.addSenderAddress}
-                      nicknames={chatNicknames}
+                      nicknames={this.state.chatNicknames}
                     />
                   </div>
                 )
               })
             }
             {
+              this.state.operations == 0 ?
+              null :
               this.state.operations.map((x, i) => {
                 return (
                   <div key={i + this.state.contentData.length}>
@@ -321,7 +393,7 @@ class ChatContent extends Component {
                       rpcSettings={this.props.rpcSettings}
                       addSenderAddress={this.props.addSenderAddress}                      
                       removeOperation={this.removeOperation}
-                      nicknames={chatNicknames}
+                      nicknames={this.state.chatNicknames}
                     />
                   </div>
                 )
