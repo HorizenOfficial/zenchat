@@ -107,6 +107,7 @@ class ChatList extends Component {
   }
 
   render () {    
+    console.log('rerendered')
     return (
       <div style={{height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden'}}>
         <div style={{height: '50px'}}>

@@ -24,6 +24,7 @@
     "babel-preset-minify": "^0.2.0",
     "babel-preset-react": "^6.24.1",
     "bitcoin": "^3.0.1",
+    "bitcoin-promise": "^1.3.1",
     "css-loader": "^0.28.5",
     "electron": "^1.6.7",
     "electron-packager": "^8.7.0",

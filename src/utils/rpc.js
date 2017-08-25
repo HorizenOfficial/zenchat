@@ -14,3 +14,13 @@ export default function rpcCall(host, port, user, pass, timeout){
 
   return rpcClient
 }
+
+export function rpcCallPromise(host, port, user, pass, timeout){
+  return new zencash.Client({
+    host,
+    port,
+    user,
+    pass,
+    timeout
+  })
+}
