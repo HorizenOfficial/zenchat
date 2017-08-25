@@ -142,8 +142,15 @@ class ChatContentItem extends Component {
     if (nextState.isValid){
       // For the valid messages
       // only rerender if there is a change
+
+      // Nickname update (need to modularize)
+      var addrDisplay = nextProps.nicknames[nextState.address] || nextState.from
+      if (addrDisplay === nextProps.userSettings.address){        
+        addrDisplay = nextProps.userSettings.nickname        
+      }      
+
       const sameIsVerified = this.state.isVerified === nextState.isVerified      
-      const sameFrom = this.state.from === nextState.from
+      const sameFrom = this.state.from === addrDisplay
       const sameMessage = this.state.message === nextState.message
       const sameAddress = this.state.address === nextState.addresss
 
@@ -274,14 +281,15 @@ class ChatContent extends Component {
     this.addOperation = this.addOperation.bind(this)
     this.removeOperation = this.removeOperation.bind(this)
     this.updateContentData = this.updateContentData.bind(this)
-    this.getChatNicknames = this.getChatNicknames.bind(this) 
+    this.getChatNicknames = this.getChatNicknames.bind(this)
+    this.setChatNicknames = this.setChatNicknames.bind(this) 
   }
 
   shouldComponentUpdate(nextProps, nextState){
     if (nextProps.chatContent.address === this.props.chatContent.address){
       // Only thing that is of concern if we get the same address
       // twice and need to update are if either one of the
-      // userSettings, rpcSettings, chatList, and the contentData, and operations changed     
+      // userSettings, rpcSettings, chatList, and the contentData, operations, nicknames have changed     
       const sameRPCSettings = JSON.stringify(nextProps.userSettings) === JSON.stringify(this.props.userSettings)
       const sameUserSettings = JSON.stringify(nextProps.rpcSettings) === JSON.stringify(this.props.rpcSettings)
       const sameChatlist = JSON.stringify(nextProps.chatList) === JSON.stringify(this.props.chatList)
@@ -289,9 +297,11 @@ class ChatContent extends Component {
       const sameContentData = nextState.contentData.length === this.state.contentData.length
       const sameOperations = nextState.operations.length === this.state.operations.length
 
-      if (sameRPCSettings && sameUserSettings && sameChatlist && sameContentData && sameOperations){        
+      const sameNicknames = JSON.stringify(this.getChatNicknames(nextProps)) === JSON.stringify(this.getChatNicknames(this.props))      
+
+      if (sameRPCSettings && sameUserSettings && sameChatlist && sameContentData && sameOperations && sameNicknames){        
         return false
-      }      
+      }
     }
 
     return true;
@@ -302,15 +312,19 @@ class ChatContent extends Component {
       this.setState({
         contentData: []
       })
+      this.setChatNicknames(nextProps)      
+    }
+
+    else if (JSON.stringify(this.getChatNicknames(this.props)) !== JSON.stringify(this.getChatNicknames(nextProps))) {
+      this.setChatNicknames(nextProps)
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
     // Only re-get chatcontent item if
     // the address aren't similar
-    if (prevProps.chatContent.address !== this.props.chatContent.address){      
-      this.updateContentData(this.props)
-      this.getChatNicknames(this.props)
+    if (prevProps.chatContent.address !== this.props.chatContent.address){          
+      this.updateContentData(this.props)      
     }
   }
 
@@ -337,8 +351,12 @@ class ChatContent extends Component {
       chatNicknames = chat[0].nicknames
     }
 
+    return chatNicknames
+  }
+
+  setChatNicknames(props){    
     this.setState({
-      chatNicknames: chatNicknames
+      chatNicknames: this.getChatNicknames(props)
     })
   }
 
