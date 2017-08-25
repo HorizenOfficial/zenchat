@@ -333,54 +333,40 @@ class ChatContent extends Component {
     const port = props.rpcSettings.rpcPort
     const user = props.rpcSettings.rpcUsername
     const pass = props.rpcSettings.rpcPassword
+    const timeout = 10000
 
-    const address = props.chatContent.address
+    const address = props.chatContent.address    
 
-    // Get received
-    rpcCall(host, port, user, pass, 10000).cmd('z_listreceivedbyaddress', address, 0, function(err, received=[], header){
+    var received = []
+    rpcCallPromise(host, port, user, pass, timeout, ['z_listreceivedbyaddress', address, 0])
+    .then(function(received=[]){
+      const receivedWithBlockheight = received.map(function(x, i) {        
+        var blockhash = rpcCallPromise(host, port, user, pass, timeout, ['gettransaction', x.txid]).then((txinfo) => txinfo.blockhash)
+        var blockheight = rpcCallPromise(host, port, user, pass, timeout, ['getblock', blockhash]).then((blockinfo) => blockinfo.height)
 
-      // Get blockheight
-      // Since its call back functions
-      // Need to mutate a var :(
-      var receivedWithBlockheight = received
-      
-      received.map(function(x, i) {
-        rpcCall(host, port, user, pass, 10000).cmd('gettransaction', x.txid, function(err, txinfo, header){             
-          receivedWithBlockheight[i].blockhash = txinfo.blockhash
-
-          rpcCall(host, port, user, pass, 10000).cmd('getblock', txinfo.blockhash, function(err, blockinfo, header){              
-            receivedWithBlockheight[i].blockheight = blockinfo.height
-          })
+        return Object.assign({}, x, {
+          blockhash,
+          blockheight
         })
       })
 
-      // Wait till callback is done
-      // Anonymous function is here for that
-      // SO BAD, need to fix this
-      function waitForBlockHeight(cntxt) {        
-        if (receivedWithBlockheight.filter((x) => x.blockheight === undefined).height > 0) {
-          setTimeout(() => waitForBlockHeight(cntxt), 500)
-          return
-        }
+      console.log(receivedWithBlockheight)
+    }.bind(this))    
+      
+      // Get blockheight
+      // Since its call back functions
+      // Need to mutate a var :(
+      // var receivedWithBlockheight = received
+      
+      // received.map(function(x, i) {
+      //   rpcCall(host, port, user, pass, 10000).cmd('gettransaction', x.txid, function(err, txinfo, header){             
+      //     receivedWithBlockheight[i].blockhash = txinfo.blockhash
 
-        const receiveSorted = receivedWithBlockheight.sort(function(first, second){
-          if (first.blockheight == second.blockheight)  
-            return 0;  
-          if (first.blockheight > second.blockheight)  
-              return -1;  
-          else  
-              return 1; 
-        })
-        
-        cntxt.setState({
-          contentData: receiveSorted
-        })
-
-        console.log(receiveSorted)
-      }
-      waitForBlockHeight(this)
-
-    }.bind(this))
+      //     rpcCall(host, port, user, pass, 10000).cmd('getblock', txinfo.blockhash, function(err, blockinfo, header){              
+      //       receivedWithBlockheight[i].blockheight = blockinfo.height
+      //     })
+      //   })
+      // })      
   }
 
   getChatNicknames(props){

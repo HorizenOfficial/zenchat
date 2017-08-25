@@ -15,12 +15,17 @@ export default function rpcCall(host, port, user, pass, timeout){
   return rpcClient
 }
 
-export function rpcCallPromise(host, port, user, pass, timeout){
-  return new zencash.Client({
-    host,
-    port,
-    user,
-    pass,
-    timeout
+export function rpcCallPromise(host, port, user, pass, timeout, args=[]){
+  var promise = new Promise(function(resolve, reject){
+    rpcCall(host, port, user, pass, timeout).cmd(...args, function(err, resp, headers){
+      if (err){
+        reject(err)
+      }
+      else {
+        resolve(resp)
+      }
+    })
   })
+
+  return promise
 }
