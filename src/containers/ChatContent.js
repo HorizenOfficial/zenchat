@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import { List, ListItem } from 'material-ui/List'
 import CircularProgress from 'material-ui/CircularProgress'
 import TextField from 'material-ui/TextField'
+import IconButton from 'material-ui/IconButton'
 
 import ChatInfo from './ChatInfo'
 import ChatSender from '../components/ChatSender'
@@ -22,6 +23,26 @@ import { stringToHex, hexToString } from '../utils/messaging'
 import rpcCall, { rpcCallPromise } from "../utils/rpc"
 
 import '../assets/scss/ChatContent.scss'
+
+// Error sending, click to retry
+const VerifiedMessageIcon = (
+  <IconButton touch={true} tooltip='sender verified' tooltipPosition='bottom-left' >
+    <CheckCircleIconAsset color={green500}/>
+  </IconButton>
+)
+
+const UnverifiedMessageIcon = (
+  <IconButton touch={true} tooltip='unable to verify sender' tooltipPosition='bottom-left' >
+    <ProblemIconAsset color={red500}/>
+  </IconButton>
+)
+
+const ErrorSendingIcon = (
+  <IconButton touch={true} tooltip='failed to send message, tap to retry' tooltipPosition='bottom-left' >
+    <ErrorIconAsset color={red500}/>
+  </IconButton>
+)
+
 
 // Chat Content items
 // To handle sent messages (operation ids)
@@ -41,15 +62,48 @@ class ChatContentOperationItem extends Component {
       from: addrDisplay,
       isComplete: false,
       failed: false,
+      errMessage: '',
     }
 
     this.checkIsComplete = this.checkIsComplete.bind(this)
+    this.resendMessage = this.resendMessage.bind(this)
   }
 
-  componentDidUpdate(prevProps, prevState){
+  resendMessage(){
+    const host = this.props.rpcSettings.rpcHost
+    const port = this.props.rpcSettings.rpcPort
+    const user = this.props.rpcSettings.rpcUsername
+    const pass = this.props.rpcSettings.rpcPassword
+
+    const fromAddress = this.props.data.fromAddress
+    const message = this.props.data.message
+    const sendData = this.props.data.sendData
+
+    rpcCall(host, port, user, pass, 10000).cmd('z_sendmany', fromAddress, sendData, 1, 0, function(err, resp, header){        
+        // Add operation chat item
+        this.props.updateOperation(this.props.data.opid, {opid: resp, fromAddress: fromAddress, message: message, sendData: sendData})
+
+        // Reanimte
+        this.setState({
+          isComplete: false,
+          failed: false,
+          backgroundId: setInterval(this.checkIsComplete, 5000)
+        })
+    }.bind(this))
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.backgroundId)
+    this.props.removeOperation(this.props.data.opid)
+  }
+
+  componentDidUpdate(prevProps, prevState){    
     if (this.state.isComplete){
       clearInterval(this.state.backgroundId)
       this.props.removeOperation(this.props.data.opid)
+    }
+    else if (this.state.failed){
+      clearInterval(this.state.backgroundId)
     }
   }
 
@@ -67,8 +121,10 @@ class ChatContentOperationItem extends Component {
           })          
         }
         else if (resp[0].status === 'failed'){
+          const errMessage = resp[0].error.message
           this.setState({
-            failed: true
+            failed: true,
+            errMessage: errMessage
           })
         }
       } catch(err){
@@ -98,15 +154,27 @@ class ChatContentOperationItem extends Component {
     })
   }
 
-  render () {        
+  render () {  
+    const ErrorSendingIcon = (
+      <IconButton touch={true} tooltip={'Error: ' + this.state.errMessage + ' tap to retry'} tooltipPosition='bottom-left' >
+        <ErrorIconAsset color={red500}/>
+      </IconButton>
+    )      
     return (
       <ListItem
           rightIcon={
             this.state.isComplete ?
-            <CheckCircleIconAsset color={green500}/> :
+            VerifiedMessageIcon :
             this.state.failed ?
-            <ErrorIconAsset size={15} color={red500} /> :
+            ErrorSendingIcon :
             <div><CircularProgress size={15}/></div>
+          }
+          onClick={
+            () => {
+              this.state.failed ?
+              this.resendMessage() : 
+              null
+            }
           }
       >
         <p>
@@ -251,8 +319,8 @@ class ChatContentItem extends Component {
             this.state.hasAttempted ?
             (
               this.state.isVerified ?
-              <CheckCircleIconAsset color={green500}/> :
-              <ProblemIconAsset color={red500}/>
+              VerifiedMessageIcon :
+              UnverifiedMessageIcon
             ) :
             <CircularProgress size={16}/>
         }>
@@ -280,6 +348,7 @@ class ChatContent extends Component {
     }
 
     this.addOperation = this.addOperation.bind(this)
+    this.updateOperation = this.updateOperation.bind(this)
     this.removeOperation = this.removeOperation.bind(this)
     this.updateContentData = this.updateContentData.bind(this)
     this.getChatNicknames = this.getChatNicknames.bind(this)
@@ -294,6 +363,8 @@ class ChatContent extends Component {
 
   shouldComponentUpdate(nextProps, nextState){    
     if (nextProps.chatContent.address === this.props.chatContent.address){
+      console.log(nextState.operations)
+      
       // Only thing that is of concern if we get the same address
       // twice and need to update are if either one of the
       // userSettings, rpcSettings, chatList, and the contentData, operations, nicknames have changed     
@@ -416,6 +487,7 @@ class ChatContent extends Component {
   }
 
   addOperation(opObj) {    
+    // Copy, don't wannt mutate
     var ops = Object.assign({}, this.state.operations)
     var curOps = ops[this.props.chatContent.address] || []
     ops[this.props.chatContent.address] = curOps.concat(opObj)    
@@ -426,13 +498,31 @@ class ChatContent extends Component {
   }
 
   removeOperation(opid){
+    // Copy, don't wannt mutate
     var ops = Object.assign({}, this.state.operations)
     var curOps = ops[this.props.chatContent.address] || []
     ops[this.props.chatContent.address] = curOps.filter((x) => x.opid !== opid)
 
     this.setState({
       operations: ops
-    }, this.updateContentData(this.props)) 
+    }) 
+  }
+
+  updateOperation(opid, opObj) {
+    // Copy, don't wannt mutate
+    var ops = Object.assign({}, this.state.operations)
+    var curOps = ops[this.props.chatContent.address] || []    
+    curOps = curOps.map(function(x){
+      if (x.opid === opid){
+        return opObj
+      }
+      return x
+    })
+    ops[this.props.chatContent.address] = curOps
+
+    this.setState({
+      operations: ops
+    })
   }
 
   render () {
@@ -466,7 +556,8 @@ class ChatContent extends Component {
                       data={x}
                       userSettings={this.props.userSettings}
                       rpcSettings={this.props.rpcSettings}
-                      addSenderAddress={this.props.addSenderAddress}                      
+                      addSenderAddress={this.props.addSenderAddress}
+                      updateOperation={this.updateOperation}                 
                       removeOperation={this.removeOperation}
                       nicknames={this.state.chatNicknames}
                     />

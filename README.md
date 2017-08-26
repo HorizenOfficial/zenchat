@@ -2,6 +2,10 @@
 
 Private and Anonymous Messaging Application, built on top of the Zencash blockchain
 
+### TODO:
+1. Add types (flow)
+2. Add Unit Tests
+
 ### To get started:
 * Run `npm install`
 
