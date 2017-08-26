@@ -338,35 +338,50 @@ class ChatContent extends Component {
     const address = props.chatContent.address    
 
     var received = []
-    rpcCallPromise(host, port, user, pass, timeout, ['z_listreceivedbyaddress', address, 0])
-    .then(function(received=[]){
-      const receivedWithBlockheight = received.map(function(x, i) {        
-        var blockhash = rpcCallPromise(host, port, user, pass, timeout, ['gettransaction', x.txid]).then((txinfo) => txinfo.blockhash)
-        var blockheight = rpcCallPromise(host, port, user, pass, timeout, ['getblock', blockhash]).then((blockinfo) => blockinfo.height)
 
-        return Object.assign({}, x, {
-          blockhash,
-          blockheight
+    rpcCallPromise(host, port, user, pass, timeout, ['z_listreceivedbyaddress', address, 0])
+    .then(function(received=[]){            
+
+      // Promise to get blockhash
+      var blockHashpromises = received.map(function(x, i) {  
+        // Get transaction info (blockhash)
+        return rpcCallPromise(host, port, user, pass, timeout, ['gettransaction', x.txid])
+        .then(function(txinfo){          
+          return Object.assign({}, x, {
+            blockhash: txinfo.blockhash
+          })
         })
+        .catch((x) => console.log(x))
       })
 
-      console.log(receivedWithBlockheight)
-    }.bind(this))    
-      
-      // Get blockheight
-      // Since its call back functions
-      // Need to mutate a var :(
-      // var receivedWithBlockheight = received
-      
-      // received.map(function(x, i) {
-      //   rpcCall(host, port, user, pass, 10000).cmd('gettransaction', x.txid, function(err, txinfo, header){             
-      //     receivedWithBlockheight[i].blockhash = txinfo.blockhash
+      // Resolve promise for blockhash
+      Promise.all(blockHashpromises)
+      .then(function(receivedWithBlockhash){
 
-      //     rpcCall(host, port, user, pass, 10000).cmd('getblock', txinfo.blockhash, function(err, blockinfo, header){              
-      //       receivedWithBlockheight[i].blockheight = blockinfo.height
-      //     })
-      //   })
-      // })      
+        // Map promise for blockheight
+        var blockHeightpromises = receivedWithBlockhash.map(function(x, i){
+          return rpcCallPromise(host, port, user, pass, timeout, ['getblock', x.blockhash])          
+          .then(function(blockinfo){      
+            return Object.assign({}, x, {
+              blockheight: blockinfo.height
+            })
+          })
+          .catch((x) => console.log(x))
+        })
+
+        // Resolve blockheight promise
+        Promise.all(blockHeightpromises)
+        .then(function(receivedWithBlockheight){
+          // Sort by block height
+          const receiveSorted = receivedWithBlockheight.sort((a, b) => a.blockheight - b.blockheight)
+          
+          this.setState({
+            contentData: receiveSorted
+          })          
+        }.bind(this))
+
+      }.bind(this))
+    }.bind(this))    
   }
 
   getChatNicknames(props){
