@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ReactDOM from 'react-dom';
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -283,6 +284,12 @@ class ChatContent extends Component {
     this.updateContentData = this.updateContentData.bind(this)
     this.getChatNicknames = this.getChatNicknames.bind(this)
     this.setChatNicknames = this.setChatNicknames.bind(this) 
+
+    this.scrollToBottom = this.scrollToBottom.bind(this)
+  }  
+
+  scrollToBottom() {    
+    this.messagesEnd.scrollIntoView()
   }
 
   shouldComponentUpdate(nextProps, nextState){
@@ -290,8 +297,8 @@ class ChatContent extends Component {
       // Only thing that is of concern if we get the same address
       // twice and need to update are if either one of the
       // userSettings, rpcSettings, chatList, and the contentData, operations, nicknames have changed     
-      const sameRPCSettings = JSON.stringify(nextProps.userSettings) === JSON.stringify(this.props.userSettings)
-      const sameUserSettings = JSON.stringify(nextProps.rpcSettings) === JSON.stringify(this.props.rpcSettings)
+      const sameUserSettings = JSON.stringify(nextProps.userSettings) === JSON.stringify(this.props.userSettings)
+      const sameRPCSettings = JSON.stringify(nextProps.rpcSettings) === JSON.stringify(this.props.rpcSettings)
       const sameChatlist = JSON.stringify(nextProps.chatList) === JSON.stringify(this.props.chatList)
 
       const sameContentData = nextState.contentData.length === this.state.contentData.length
@@ -305,6 +312,10 @@ class ChatContent extends Component {
     }
 
     return true;
+  }
+
+  componentDidMount() {
+    setInterval(this.updateContentData, 30000) // Updates every 30 seconds
   }
 
   componentWillReceiveProps(nextProps) {
@@ -324,11 +335,12 @@ class ChatContent extends Component {
     // Only re-get chatcontent item if
     // the address aren't similar
     if (prevProps.chatContent.address !== this.props.chatContent.address){          
-      this.updateContentData(this.props)      
+      this.updateContentData(this.props)
     }
+    this.scrollToBottom()
   }
 
-  updateContentData(props) {
+  updateContentData(props=this.props) {
     const host = props.rpcSettings.rpcHost
     const port = props.rpcSettings.rpcPort
     const user = props.rpcSettings.rpcUsername
@@ -351,7 +363,7 @@ class ChatContent extends Component {
             blockhash: txinfo.blockhash
           })
         })
-        .catch((x) => console.log(x))
+        .catch((x) => console.log('gettransaction', x, x.txinfo))
       })
 
       // Resolve promise for blockhash
@@ -366,7 +378,7 @@ class ChatContent extends Component {
               blockheight: blockinfo.height
             })
           })
-          .catch((x) => console.log(x))
+          .catch((x) => console.log('getblock', x, x.blockhash))
         })
 
         // Resolve blockheight promise
@@ -375,9 +387,11 @@ class ChatContent extends Component {
           // Sort by block height
           const receiveSorted = receivedWithBlockheight.sort((a, b) => a.blockheight - b.blockheight)
           
+          // Set content data
+          // and scroll to bottom
           this.setState({
             contentData: receiveSorted
-          })          
+          }, () => setTimeout(this.scrollToBottom, 250))
         }.bind(this))
 
       }.bind(this))
@@ -459,6 +473,9 @@ class ChatContent extends Component {
               })
             }
           </List>
+          <div style={{ float:"left", clear: "both" }}
+                ref={(el) => { this.messagesEnd = el; }}>
+          </div>
         </div>
         <ChatSender
           addOperation={this.addOperation}
