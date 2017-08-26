@@ -363,7 +363,6 @@ class ChatContent extends Component {
 
   shouldComponentUpdate(nextProps, nextState){    
     if (nextProps.chatContent.address === this.props.chatContent.address){
-      console.log(nextState.operations)
       
       // Only thing that is of concern if we get the same address
       // twice and need to update are if either one of the
@@ -423,7 +422,8 @@ class ChatContent extends Component {
     var received = []
 
     rpcCallPromise(host, port, user, pass, timeout, ['z_listreceivedbyaddress', address, 0])
-    .then(function(received=[]){            
+    .then(function(received=[]){        
+      console.log(received)
 
       // Promise to get blockhash
       var blockHashpromises = received.map(function(x, i) {  
@@ -434,12 +434,13 @@ class ChatContent extends Component {
             blockhash: txinfo.blockhash
           })
         })
-        .catch((err) => console.log('gettransaction', err, x.txinfo))
+        .catch((err) => console.log('gettransaction', i, err, x.txinfo))
       })
 
       // Resolve promise for blockhash
       Promise.all(blockHashpromises)
       .then(function(receivedWithBlockhash){
+        console.log(receivedWithBlockhash)
 
         // Map promise for blockheight
         var blockHeightpromises = receivedWithBlockhash.map(function(x, i){          
@@ -449,12 +450,13 @@ class ChatContent extends Component {
               blockheight: blockinfo.height
             })
           })
-          .catch((err) => console.log('getblock', err, x.blockhash))
+          .catch((err) => console.log('getblock', i, err, x.blockhash))
         })
 
         // Resolve blockheight promise
         Promise.all(blockHeightpromises)
         .then(function(receivedWithBlockheight){
+          console.log(receivedWithBlockheight)
           // Sort by block height
           const receiveSorted = receivedWithBlockheight.sort((a, b) => a.blockheight - b.blockheight)
           
