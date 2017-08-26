@@ -138,7 +138,7 @@ class ChatContentItem extends Component {
     this.getMessageInfo = this.getMessageInfo.bind(this)
   }
 
-  shouldComponentUpdate(nextProps, nextState){    
+  shouldComponentUpdate(nextProps, nextState){  
     // Only re-render valid messages
     if (nextState.isValid){
       // For the valid messages
@@ -276,7 +276,7 @@ class ChatContent extends Component {
 
     this.state = {
       contentData: [],      
-      operations: [], // operations: [ {opid: '', fromAddress: ''} ]
+      operations: {}, // operations: { address: [ {opid: '', fromAddress: ''} ] }
     }
 
     this.addOperation = this.addOperation.bind(this)
@@ -292,7 +292,7 @@ class ChatContent extends Component {
     this.messagesEnd.scrollIntoView()
   }
 
-  shouldComponentUpdate(nextProps, nextState){
+  shouldComponentUpdate(nextProps, nextState){    
     if (nextProps.chatContent.address === this.props.chatContent.address){
       // Only thing that is of concern if we get the same address
       // twice and need to update are if either one of the
@@ -302,7 +302,7 @@ class ChatContent extends Component {
       const sameChatlist = JSON.stringify(nextProps.chatList) === JSON.stringify(this.props.chatList)
 
       const sameContentData = nextState.contentData.length === this.state.contentData.length
-      const sameOperations = nextState.operations.length === this.state.operations.length
+      const sameOperations = JSON.stringify(nextState.operations) === JSON.stringify(this.state.operations)
 
       const sameNicknames = JSON.stringify(this.getChatNicknames(nextProps)) === JSON.stringify(this.getChatNicknames(this.props))      
 
@@ -363,7 +363,7 @@ class ChatContent extends Component {
             blockhash: txinfo.blockhash
           })
         })
-        .catch((x) => console.log('gettransaction', x, x.txinfo))
+        .catch((err) => console.log('gettransaction', err, x.txinfo))
       })
 
       // Resolve promise for blockhash
@@ -371,14 +371,14 @@ class ChatContent extends Component {
       .then(function(receivedWithBlockhash){
 
         // Map promise for blockheight
-        var blockHeightpromises = receivedWithBlockhash.map(function(x, i){
+        var blockHeightpromises = receivedWithBlockhash.map(function(x, i){          
           return rpcCallPromise(host, port, user, pass, timeout, ['getblock', x.blockhash])          
           .then(function(blockinfo){      
-            return Object.assign({}, x, {
+            return Object.assign({}, x, {              
               blockheight: blockinfo.height
             })
           })
-          .catch((x) => console.log('getblock', x, x.blockhash))
+          .catch((err) => console.log('getblock', err, x.blockhash))
         })
 
         // Resolve blockheight promise
@@ -415,31 +415,35 @@ class ChatContent extends Component {
     })
   }
 
-  addOperation(opObj) {
-    const ops = this.state.operations
+  addOperation(opObj) {    
+    var ops = Object.assign({}, this.state.operations)
+    var curOps = ops[this.props.chatContent.address] || []
+    ops[this.props.chatContent.address] = curOps.concat(opObj)    
 
     this.setState({
-      operations: ops.concat(opObj)
+      operations: ops
     })    
   }
 
   removeOperation(opid){
-    const ops = this.state.operations
+    var ops = Object.assign({}, this.state.operations)
+    var curOps = ops[this.props.chatContent.address] || []
+    ops[this.props.chatContent.address] = curOps.filter((x) => x.opid !== opid)
 
     this.setState({
-      operations: ops.filter((x) => x.opid !== opid)
+      operations: ops
     }, this.updateContentData(this.props)) 
   }
 
-  render () {    
+  render () {
+    const operations = this.state.operations[this.props.chatContent.address] || []
+
     return (
       <div className='chatContainerStyle'>
         <ChatInfo/>
         <div className='chatAreaStyle'>        
           <List>
-            {
-              this.state.contentData.length == 0 ?
-              null :
+            {              
               this.state.contentData.map((x, i) => {
                 return (
                   <div key={i}>
@@ -454,10 +458,8 @@ class ChatContent extends Component {
                 )
               })
             }
-            {
-              this.state.operations == 0 ?
-              null :
-              this.state.operations.map((x, i) => {
+            {              
+              operations.map((x, i) => {
                 return (
                   <div key={i + this.state.contentData.length}>
                     <ChatContentOperationItem
