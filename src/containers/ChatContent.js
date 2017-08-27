@@ -195,7 +195,11 @@ class ChatContentOperationItem extends Component {
 class ChatContentItem extends Component {
   render () {
     const address = this.props.data.zenmsg.from
-    const displayName = this.props.chatNicknames[address] || address
+    var displayName = this.props.chatNicknames[address] || address
+
+    if (displayName === this.props.userSettings.address){        
+      displayName = this.props.userSettings.nickname        
+    }
 
     return (
       <ListItem rightIcon={          
