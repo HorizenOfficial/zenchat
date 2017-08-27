@@ -1,8 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const BabiliPlugin = require('babili-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MinifyPlugin = require('babel-minify-webpack-plugin');
 
 // Config directories
 const SRC_DIR = path.resolve(__dirname, 'src');
@@ -23,6 +22,7 @@ module.exports = {
       { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
       { test: /\.jsx$/, loader: 'babel-loader', exclude: /node_modules/ },
       { test: /\.css$/, loader: 'style-loader!css-loader?modules=true&localIdentName=[name]__[local]___[hash:base64:5]', include: /flexboxgrid/},
+      { test: /\.scss/, loader: 'style-loader!css-loader!sass-loader' },
       {
           test: /\.jpe?g$|\.ico$|\.gif$|\.png$|\.svg$|\.woff$|\.ttf$|\.wav$|\.mp3$/,
           loader: 'file-loader?name=[name].[ext]'  // <-- retain original file name
@@ -35,12 +35,10 @@ module.exports = {
       template: './src/index.html',      
       filename: 'index.html',
       inject: 'body'
-    }),
-    new ExtractTextPlugin('bundle.css'),
+    }),    
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production')
-    }),
-    new BabiliPlugin()
+    })    
   ],
   stats: {
     colors: true,
