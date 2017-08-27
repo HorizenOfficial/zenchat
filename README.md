@@ -1,6 +1,8 @@
 # ZENChat
 
-Private and Anonymous Messaging Application, built on top of the Zencash blockchain
+Private and Anonymous Messaging Application, built on top of the Zencash blockchain.
+
+![](http://i.imgur.com/7Dc45pR.gif)
 
 ### TODO:
 1. Add types (flow)
