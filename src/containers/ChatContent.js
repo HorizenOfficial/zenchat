@@ -89,7 +89,7 @@ class ChatContentOperationItem extends Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.state.backgroundId)    
+    clearInterval(this.state.backgroundId)
   }
 
   componentDidUpdate(prevProps, prevState){    
@@ -332,7 +332,7 @@ class ChatContent extends Component {
             signVerified: isVerified
           })
         }.bind(this))
-      }.bind(this), {concurrency: 5})
+      }.bind(this), {concurrency: 3})
       .then(function(receivedVerifiedZenMsg){  
               
         // Get blockhash
@@ -347,7 +347,7 @@ class ChatContent extends Component {
             console.log('gettransaction', i, err)
             return x
           })
-        }, {concurrency: 5}).then(function(receivedWithBlockhash){
+        }, {concurrency: 3}).then(function(receivedWithBlockhash){
 
           // Get block height from blockhash
           Promise.map(receivedWithBlockhash, function(x, i){
@@ -366,7 +366,7 @@ class ChatContent extends Component {
                 blockheight: 2147483646
               })            
             })
-          }, {concurrency: 5})
+          }, {concurrency: 3})
           .then(function(receivedWithBlockheight){
             const receiveSorted = receivedWithBlockheight.sort((a, b) => a.blockheight - b.blockheight)            
             this.setState({
