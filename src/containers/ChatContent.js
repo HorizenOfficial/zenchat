@@ -1,3 +1,5 @@
+import Promise from 'bluebird'
+
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom';
 
@@ -17,7 +19,7 @@ import { selectChatContent, addSenderAddress } from '../actions/ChatContent'
 import CheckCircleIconAsset from 'material-ui/svg-icons/action/check-circle'
 import ProblemIconAsset from 'material-ui/svg-icons/action/report-problem'
 import ErrorIconAsset from 'material-ui/svg-icons/alert/error'
-import { lightBlack, darkBlack, green500, red500 } from 'material-ui/styles/colors'
+import { lightBlack, darkBlack, green500, red500, orange500 } from 'material-ui/styles/colors'
 
 import { stringToHex, hexToString } from '../utils/messaging'
 import rpcCall, { rpcCallPromise } from "../utils/rpc"
@@ -33,7 +35,7 @@ const VerifiedMessageIcon = (
 
 const UnverifiedMessageIcon = (
   <IconButton touch={true} tooltip='unable to verify sender' tooltipPosition='bottom-left' >
-    <ProblemIconAsset color={red500}/>
+    <ProblemIconAsset color={orange500}/>
   </IconButton>
 )
 
@@ -422,52 +424,42 @@ class ChatContent extends Component {
     var received = []
 
     rpcCallPromise(host, port, user, pass, timeout, ['z_listreceivedbyaddress', address, 0])
-    .then(function(received=[]){        
-      console.log(received)
+    .then(function(received=[]){
 
-      // Promise to get blockhash
-      var blockHashpromises = received.map(function(x, i) {  
-        // Get transaction info (blockhash)
+      // Get blockhash
+      Promise.map(received, function(x, i){
         return rpcCallPromise(host, port, user, pass, timeout, ['gettransaction', x.txid])
         .then(function(txinfo){          
           return Object.assign({}, x, {
             blockhash: txinfo.blockhash
           })
         })
-        .catch((err) => console.log('gettransaction', i, err, x.txinfo))
-      })
+        .catch(function(err){          
+          console.log('gettransaction', i, err, x.txinfo)
+          return x
+        })
+      }, {concurrency: 5}).then(function(receivedWithBlockhash){
 
-      // Resolve promise for blockhash
-      Promise.all(blockHashpromises)
-      .then(function(receivedWithBlockhash){
-        console.log(receivedWithBlockhash)
-
-        // Map promise for blockheight
-        var blockHeightpromises = receivedWithBlockhash.map(function(x, i){          
+        // Get block height from blockhash
+        Promise.map(receivedWithBlockhash, function(x, i){
           return rpcCallPromise(host, port, user, pass, timeout, ['getblock', x.blockhash])          
           .then(function(blockinfo){      
             return Object.assign({}, x, {              
               blockheight: blockinfo.height
             })
           })
-          .catch((err) => console.log('getblock', i, err, x.blockhash))
-        })
-
-        // Resolve blockheight promise
-        Promise.all(blockHeightpromises)
+          .catch(function(err){          
+            console.log('getblock', i, err, x.txinfo)
+            return x
+          })
+        }, {concurrency: 5})
         .then(function(receivedWithBlockheight){
-          console.log(receivedWithBlockheight)
-          // Sort by block height
           const receiveSorted = receivedWithBlockheight.sort((a, b) => a.blockheight - b.blockheight)
-          
-          // Set content data
-          // and scroll to bottom
           this.setState({
             contentData: receiveSorted
           }, () => setTimeout(this.scrollToBottom, 250))
         }.bind(this))
-
-      }.bind(this))
+      }.bind(this))      
     }.bind(this))    
   }
 
