@@ -45,8 +45,7 @@ function createWindow() {
     // Open the DevTools automatically if developing
     if ( dev ) {
       mainWindow.webContents.openDevTools();
-    }
-    mainWindow.webContents.openDevTools();
+    }    
   });
 
   // Emitted when the window is closed.
