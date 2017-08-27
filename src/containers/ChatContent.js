@@ -21,7 +21,7 @@ import ProblemIconAsset from 'material-ui/svg-icons/action/report-problem'
 import ErrorIconAsset from 'material-ui/svg-icons/alert/error'
 import { lightBlack, darkBlack, green500, red500, orange500 } from 'material-ui/styles/colors'
 
-import { stringToHex, hexToString } from '../utils/messaging'
+import { stringToHex, hexToString, memoToZenMsg } from '../utils/messaging'
 import rpcCall, { rpcCallPromise } from "../utils/rpc"
 
 import '../assets/scss/ChatContent.scss'
@@ -98,6 +98,7 @@ class ChatContentOperationItem extends Component {
       clearInterval(this.state.backgroundId)
 
       // Remove operation id 3 minutes later
+      // (allow time for blockchain to sync)
       setTimeout(
         () => this.props.removeOperation(this.props.data.opid),
         60000 * 3
@@ -192,151 +193,27 @@ class ChatContentOperationItem extends Component {
 // Chat Content items
 // are the messages themselves (NOT OPERATION ID)
 class ChatContentItem extends Component {
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      isValid: false,  // is this a valid memo (needs to adhere with ZEN messaging protocol)      
-      isVerified: true, // is the message verified by the `verifymessage`?
-      hasAttempted: false, // have we tried to convert it into a zenmsg obj and verify it?
-      from: '', // Who is the message from (nickname || address)
-      message: '', // what does hte message contain
-      address: '', // Who is the message from (address always)
-    }
-
-    this.getMessageInfo = this.getMessageInfo.bind(this)
-  }
-
-  shouldComponentUpdate(nextProps, nextState){  
-    // Only re-render valid messages
-    if (nextState.isValid){
-      // For the valid messages
-      // only rerender if there is a change
-
-      // Nickname update (need to modularize)
-      var addrDisplay = nextProps.nicknames[nextState.address] || nextState.from
-      if (addrDisplay === nextProps.userSettings.address){        
-        addrDisplay = nextProps.userSettings.nickname        
-      }      
-
-      const sameIsVerified = this.state.isVerified === nextState.isVerified      
-      const sameFrom = this.state.from === addrDisplay
-      const sameMessage = this.state.message === nextState.message
-      const sameAddress = this.state.address === nextState.addresss
-
-      if (sameIsVerified && sameFrom && sameMessage && sameAddress){
-        return false
-      }      
-      
-      // If they're different then render them
-      return true
-    }
-
-    return false
-  }
-
-  componentDidMount(){    
-    this.getMessageInfo(this.props)   
-  }
-
-  componentWillReceiveProps(nextProps){    
-    // Update nickname
-    // Convert address to nickname (if exist)      
-    var addrDisplay = nextProps.nicknames[this.state.address] || this.state.from
-
-    // Sender address
-    if (addrDisplay === nextProps.userSettings.address){        
-      addrDisplay = nextProps.userSettings.nickname        
-    }   
-    
-    this.setState({      
-      from: addrDisplay,        
-    })
-  }
-
-  // Converts memo into a zenmsg object
-  getMessageInfo(props){
-    var zenmsg, addrDisplay
-    
-    // ZEN Messaging Protocol v1
-    // Need to put this into another file soon
-    try {            
-      var obj = JSON.parse(hexToString(props.data.memo))
-      
-      if (obj.zenmsg === undefined)
-        throw "invalid zenmsg"
-
-      zenmsg = obj.zenmsg      
-
-      if (zenmsg.ver === undefined ||
-          zenmsg.from === undefined ||
-          zenmsg.message === undefined ||
-          zenmsg.sign === undefined){        
-        throw "invalid zenmsg"
-      }      
-
-      // Convert address to nickname (if exist)      
-      addrDisplay = props.nicknames[zenmsg.from] || zenmsg.from
-
-      // Sender address
-      if (addrDisplay === props.userSettings.address){        
-        addrDisplay = props.userSettings.nickname        
-      }            
-    } catch (err) {
-      this.setState({
-        hasAttempted: true
-      })
-      return
-    }
-
-    const host = props.rpcSettings.rpcHost
-    const port = props.rpcSettings.rpcPort
-    const user = props.rpcSettings.rpcUsername
-    const pass = props.rpcSettings.rpcPassword
-
-    // Convert msg to utf, and to hex and to uppercase before signed
-    // need to do the same to verify
-    const encodedMsg = stringToHex(zenmsg.message).toUpperCase()
-
-    rpcCall(host, port, user, pass).cmd('verifymessage', zenmsg.from, zenmsg.sign, encodedMsg, function(err, resp, headers){      
-      if(resp){
-        props.addSenderAddress(zenmsg.from)
-      }      
-      this.setState({
-        isValid: true,
-        hasAttempted: true,
-        isVerified: resp,
-        from: addrDisplay,
-        message: zenmsg.message,
-        address: zenmsg.from      
-      })
-    }.bind(this))
-  }
-  
   render () {
-    if (this.state.isValid && this.state.hasAttempted) {       
-      return (
-        <ListItem rightIcon={
-            this.state.hasAttempted ?
-            (
-              this.state.isVerified ?
-              VerifiedMessageIcon :
-              UnverifiedMessageIcon
-            ) :
-            <CircularProgress size={16}/>
-        }>
-          <p>
-            <span className="chatMessageSender">{this.state.from}</span>&nbsp;&nbsp;
-            <span className="chatMessageBlockheight">block no.&nbsp;{this.props.data.blockheight}</span>
-            <br />
-            <span className="chatMessageContent">{this.state.message}</span>
-            <br />
-          </p>
-        </ListItem>
-      )
-    } else {
-      return null
-    }
+    const address = this.props.data.zenmsg.from
+    const displayName = this.props.chatNicknames[address] || address
+
+    return (
+      <ListItem rightIcon={          
+        (
+          this.props.data.signVerified ?
+          VerifiedMessageIcon :
+          UnverifiedMessageIcon
+        )          
+      }>
+        <p>
+          <span className="chatMessageSender">{displayName}</span>&nbsp;&nbsp;
+          <span className="chatMessageBlockheight">block no.&nbsp;{this.props.data.blockheight}</span>
+          <br />
+          <span className="chatMessageContent">{this.props.data.zenmsg.message}</span>
+          <br />
+        </p>
+      </ListItem>
+    )
   }
 }
 
@@ -344,6 +221,8 @@ class ChatContent extends Component {
   constructor(props){
     super(props)
 
+    // operations are messages that
+    // are currently being sent
     this.state = {
       contentData: [],      
       operations: {}, // operations: { address: [ {opid: '', fromAddress: ''} ] }
@@ -358,10 +237,6 @@ class ChatContent extends Component {
 
     this.scrollToBottom = this.scrollToBottom.bind(this)
   }  
-
-  scrollToBottom() {    
-    this.messagesEnd.scrollIntoView()
-  }
 
   shouldComponentUpdate(nextProps, nextState){    
     if (nextProps.chatContent.address === this.props.chatContent.address){
@@ -412,6 +287,10 @@ class ChatContent extends Component {
     this.scrollToBottom()
   }
 
+  scrollToBottom() {    
+    this.messagesEnd.scrollIntoView()
+  }
+
   updateContentData(props=this.props) {
     const host = props.rpcSettings.rpcHost
     const port = props.rpcSettings.rpcPort
@@ -426,46 +305,73 @@ class ChatContent extends Component {
     rpcCallPromise(host, port, user, pass, timeout, ['z_listreceivedbyaddress', address, 0])
     .then(function(received=[]){
 
-      // Get blockhash
-      Promise.map(received, function(x, i){
-        return rpcCallPromise(host, port, user, pass, timeout, ['gettransaction', x.txid])
-        .then(function(txinfo){          
-          return Object.assign({}, x, {
-            blockhash: txinfo.blockhash
-          })
+      // Gets zenmsg from memo
+      // zenmsg is undefined if it
+      // doesn't adhere the protocol
+      const receivedZenMsg = received.map(function(x, i){        
+        return Object.assign({}, x, {
+          zenmsg: memoToZenMsg(x.memo)
         })
-        .catch(function(err){          
-          console.log('gettransaction', i, err)
-          return x
-        })
-      }, {concurrency: 5}).then(function(receivedWithBlockhash){
+      })      
 
-        // Get block height from blockhash
-        Promise.map(receivedWithBlockhash, function(x, i){
-          return rpcCallPromise(host, port, user, pass, timeout, ['getblock', x.blockhash])          
-          .then(function(blockinfo){      
-            return Object.assign({}, x, {              
-              blockheight: blockinfo.height
-            })
-          })          
-          .catch(function(err){          
-            // If you can't get block its likely its
-            // a message thats sent very recently
-            // chuck it to the end
-            console.log('getblock', i, err)
-            return Object.assign({}, x, {
-              blockheight: 2147483646
-            })            
+      // Filter out invalid zenmsgs
+      const receivedValidZenMsg = receivedZenMsg.filter((x) => x.zenmsg !== undefined)
+
+      // Check if messages are valid or not
+      Promise.map(receivedValidZenMsg, function(x, i){
+        // Convert msg to utf, and to hex and to uppercase before signed
+        // need to do the same to verify
+        const encodedMsg = stringToHex(x.zenmsg.message).toUpperCase()
+        return rpcCallPromise(host, port, user, pass, timeout, ['verifymessage', x.zenmsg.from, x.zenmsg.sign, encodedMsg])
+        .then(function(isVerified){
+          this.props.addSenderAddress(x.zenmsg.from)
+          return Object.assign({}, x, {
+            signVerified: isVerified
           })
-        }, {concurrency: 5})
-        .then(function(receivedWithBlockheight){
-          const receiveSorted = receivedWithBlockheight.sort((a, b) => a.blockheight - b.blockheight)
-          console.log(receiveSorted)
-          this.setState({
-            contentData: receiveSorted
-          }, () => setTimeout(this.scrollToBottom, 250))
         }.bind(this))
-      }.bind(this))      
+      }.bind(this), {concurrency: 5})
+      .then(function(receivedVerifiedZenMsg){  
+              
+        // Get blockhash
+        Promise.map(receivedVerifiedZenMsg, function(x, i){
+          return rpcCallPromise(host, port, user, pass, timeout, ['gettransaction', x.txid])
+          .then(function(txinfo){          
+            return Object.assign({}, x, {
+              blockhash: txinfo.blockhash
+            })
+          })
+          .catch(function(err){          
+            console.log('gettransaction', i, err)
+            return x
+          })
+        }, {concurrency: 5}).then(function(receivedWithBlockhash){
+
+          // Get block height from blockhash
+          Promise.map(receivedWithBlockhash, function(x, i){
+            return rpcCallPromise(host, port, user, pass, timeout, ['getblock', x.blockhash])          
+            .then(function(blockinfo){      
+              return Object.assign({}, x, {              
+                blockheight: blockinfo.height
+              })
+            })          
+            .catch(function(err){          
+              // If you can't get block its likely its
+              // a message thats sent very recently
+              // chuck it to the end
+              console.log('getblock', i, err)
+              return Object.assign({}, x, {
+                blockheight: 2147483646
+              })            
+            })
+          }, {concurrency: 5})
+          .then(function(receivedWithBlockheight){
+            const receiveSorted = receivedWithBlockheight.sort((a, b) => a.blockheight - b.blockheight)            
+            this.setState({
+              contentData: receiveSorted
+            }, () => setTimeout(this.scrollToBottom, 250))
+          }.bind(this))
+        }.bind(this))      
+      }.bind(this))  
     }.bind(this))    
   }
 
@@ -485,7 +391,7 @@ class ChatContent extends Component {
       chatNicknames: this.getChatNicknames(props)
     })
   }
-
+  
   addOperation(opObj) {    
     // Copy, don't wannt mutate
     var ops = Object.assign({}, this.state.operations)
@@ -556,7 +462,7 @@ class ChatContent extends Component {
                           userSettings={this.props.userSettings}
                           rpcSettings={this.props.rpcSettings}
                           addSenderAddress={this.props.addSenderAddress}
-                          nicknames={this.state.chatNicknames}
+                          chatNicknames={this.state.chatNicknames}
                         />
                       </div>
                     )

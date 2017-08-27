@@ -13,8 +13,37 @@ function stringToHex(str) {
   return Buffer.from(utf8_str, 'utf8').toString('hex')
 }
 
+// Converts a memo (string)
+// to a zenmsg (obj)
+// if there is none, return undefined
+function memoToZenMsg(memo){
+  var zenmsg
+  
+  // ZEN Messaging Protocol v1
+  // Need to put this into another file soon
+  try {            
+    var obj = JSON.parse(hexToString(memo))
+    
+    if (obj.zenmsg === undefined)
+      throw "invalid zenmsg"
+
+    zenmsg = obj.zenmsg      
+
+    if (zenmsg.ver === undefined ||
+        zenmsg.from === undefined ||
+        zenmsg.message === undefined ||
+        zenmsg.sign === undefined){
+      throw "invalid zenmsg"
+    }
+    return zenmsg
+
+  } catch (err) {    
+    return undefined
+  }
+}
 
 module.exports = {
   hexToString: hexToString,
-  stringToHex: stringToHex
+  stringToHex: stringToHex,
+  memoToZenMsg: memoToZenMsg
 }
