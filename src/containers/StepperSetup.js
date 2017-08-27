@@ -257,6 +257,9 @@ class StepperSetup extends Component {
 
     return (      
       <div style={{width: '100%', maxWidth: 700, margin: 'auto'}}>
+        <div style={{textAlign: 'center', paddingTop: '25px'}}>
+          <h1>ZENChat Setup</h1>
+        </div>
         <Stepper activeStep={stepIndex}>
           <Step>
             <StepLabel>RPC Settings</StepLabel>

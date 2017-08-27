@@ -89,8 +89,7 @@ class ChatContentOperationItem extends Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.state.backgroundId)
-    this.props.removeOperation(this.props.data.opid)
+    clearInterval(this.state.backgroundId)    
   }
 
   componentDidUpdate(prevProps, prevState){    
@@ -100,8 +99,8 @@ class ChatContentOperationItem extends Component {
       // Remove operation id 3 minutes later
       // (allow time for blockchain to sync)
       setTimeout(
-        () => this.props.removeOperation(this.props.data.opid),
-        60000 * 3
+        () => this.props.removeOperation(this.props.chatContent.address, this.props.data.opid),
+        6000 * 3
       )      
     }
     else if (this.state.failed){
@@ -407,11 +406,11 @@ class ChatContent extends Component {
     })    
   }
 
-  removeOperation(opid){
+  removeOperation(opaddress, opid){
     // Copy, don't wannt mutate
     var ops = Object.assign({}, this.state.operations)
-    var curOps = ops[this.props.chatContent.address] || []
-    ops[this.props.chatContent.address] = curOps.filter((x) => x.opid !== opid)
+    var curOps = ops[opaddress] || []
+    ops[opaddress] = curOps.filter((x) => x.opid !== opid)
 
     this.setState({
       operations: ops
@@ -484,6 +483,7 @@ class ChatContent extends Component {
                           updateOperation={this.updateOperation}                 
                           removeOperation={this.removeOperation}
                           nicknames={this.state.chatNicknames}
+                          chatContent={this.props.chatContent}
                         />
                       </div>
                     )
