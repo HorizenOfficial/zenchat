@@ -38,11 +38,6 @@ class CheckRPCConnection extends Component {
     this.checkRPCConnection = this.checkRPCConnection.bind(this)
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    const sameRPCSettings = JSON.stringify(nextProps.rpcSettings) === JSON.stringify(this.props.rpcSettings)
-    return (!sameRPCSettings)
-  }
-
   checkRPCConnection () {
     // RPC Call
     const host = this.props.rpcHost
