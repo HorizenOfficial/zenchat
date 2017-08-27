@@ -24,7 +24,7 @@ import { lightBlack, darkBlack, green500, red500 } from 'material-ui/styles/colo
 
 import rpcCall from "../utils/rpc"
 
-import '../assets/scss/main.scss'
+import '../assets/scss/ChatList.scss'
 
 
 class CheckRPCConnection extends Component {

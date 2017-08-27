@@ -5,6 +5,18 @@
   height: 100%
 }
 
+// Chat content placeholder
+// e.g display loading icon
+// display welcome message
+.chatContentPlaceholderStyle {  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 15px;  
+  padding-top: 33vh;
+}
+
 // ChatContent
 .chatAreaStyle {
   flex: 1;
@@ -25,7 +37,13 @@
 // Chat Message Sender
 .chatMessageSender {
   color: #2c3e50;
-  font-size: 15px;
+  font-weight: 2;
+  font-size: 16px;
+}
+
+.chatMessageBlockheight {
+  color: #7f8c8d;
+  font-size: 12px;
 }
 
 // Chat Message Content

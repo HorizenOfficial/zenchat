@@ -41,9 +41,9 @@ export default class ChatSender extends Component {
     // before signing it. verifying it is also the same process
     const encodedMsg = stringToHex(msg).toUpperCase()
     
-    rpcCall(host, port, user, pass, 10000).cmd('signmessage', fromAddress, encodedMsg, function(err, resp, headers){
+    rpcCall(host, port, user, pass, 10000).cmd('signmessage', fromAddress, encodedMsg, function(err, signed, headers){
       // Set the signed message
-      obj.zenmsg.sign = resp
+      obj.zenmsg.sign = signed
 
       // Convert to hex
       const memo = stringToHex(JSON.stringify(obj))

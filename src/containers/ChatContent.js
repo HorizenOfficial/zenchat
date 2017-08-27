@@ -25,10 +25,11 @@ import { stringToHex, hexToString } from '../utils/messaging'
 import rpcCall, { rpcCallPromise } from "../utils/rpc"
 
 import '../assets/scss/ChatContent.scss'
+import '../assets/scss/main.scss'
 
 // Error sending, click to retry
 const VerifiedMessageIcon = (
-  <IconButton touch={true} tooltip='sender verified' tooltipPosition='bottom-left' >
+  <IconButton touch={true} tooltip='verified sender' tooltipPosition='bottom-left' >
     <CheckCircleIconAsset color={green500}/>
   </IconButton>
 )
@@ -38,13 +39,6 @@ const UnverifiedMessageIcon = (
     <ProblemIconAsset color={orange500}/>
   </IconButton>
 )
-
-const ErrorSendingIcon = (
-  <IconButton touch={true} tooltip='failed to send message, tap to retry' tooltipPosition='bottom-left' >
-    <ErrorIconAsset color={red500}/>
-  </IconButton>
-)
-
 
 // Chat Content items
 // To handle sent messages (operation ids)
@@ -102,7 +96,12 @@ class ChatContentOperationItem extends Component {
   componentDidUpdate(prevProps, prevState){    
     if (this.state.isComplete){
       clearInterval(this.state.backgroundId)
-      this.props.removeOperation(this.props.data.opid)
+
+      // Remove operation id 3 minutes later
+      setTimeout(
+        () => this.props.removeOperation(this.props.data.opid),
+        60000 * 3
+      )      
     }
     else if (this.state.failed){
       clearInterval(this.state.backgroundId)
@@ -327,7 +326,8 @@ class ChatContentItem extends Component {
             <CircularProgress size={16}/>
         }>
           <p>
-            <span className="chatMessageSender">{this.state.from}</span>
+            <span className="chatMessageSender">{this.state.from}</span>&nbsp;&nbsp;
+            <span className="chatMessageBlockheight">block no.&nbsp;{this.props.data.blockheight}</span>
             <br />
             <span className="chatMessageContent">{this.state.message}</span>
             <br />
@@ -435,7 +435,7 @@ class ChatContent extends Component {
           })
         })
         .catch(function(err){          
-          console.log('gettransaction', i, err, x.txinfo)
+          console.log('gettransaction', i, err)
           return x
         })
       }, {concurrency: 5}).then(function(receivedWithBlockhash){
@@ -447,14 +447,20 @@ class ChatContent extends Component {
             return Object.assign({}, x, {              
               blockheight: blockinfo.height
             })
-          })
+          })          
           .catch(function(err){          
-            console.log('getblock', i, err, x.txinfo)
-            return x
+            // If you can't get block its likely its
+            // a message thats sent very recently
+            // chuck it to the end
+            console.log('getblock', i, err)
+            return Object.assign({}, x, {
+              blockheight: 2147483646
+            })            
           })
         }, {concurrency: 5})
         .then(function(receivedWithBlockheight){
           const receiveSorted = receivedWithBlockheight.sort((a, b) => a.blockheight - b.blockheight)
+          console.log(receiveSorted)
           this.setState({
             contentData: receiveSorted
           }, () => setTimeout(this.scrollToBottom, 250))
@@ -525,41 +531,57 @@ class ChatContent extends Component {
     return (
       <div className='chatContainerStyle'>
         <ChatInfo/>
-        <div className='chatAreaStyle'>        
-          <List>
-            {              
-              this.state.contentData.map((x, i) => {
-                return (
-                  <div key={i}>
-                    <ChatContentItem                                                           
-                      data={x}                      
-                      userSettings={this.props.userSettings}
-                      rpcSettings={this.props.rpcSettings}
-                      addSenderAddress={this.props.addSenderAddress}
-                      nicknames={this.state.chatNicknames}
-                    />
-                  </div>
-                )
-              })
-            }
-            {              
-              operations.map((x, i) => {
-                return (
-                  <div key={i + this.state.contentData.length}>
-                    <ChatContentOperationItem
-                      data={x}
-                      userSettings={this.props.userSettings}
-                      rpcSettings={this.props.rpcSettings}
-                      addSenderAddress={this.props.addSenderAddress}
-                      updateOperation={this.updateOperation}                 
-                      removeOperation={this.removeOperation}
-                      nicknames={this.state.chatNicknames}
-                    />
-                  </div>
-                )
-              })
-            }
-          </List>
+        <div className='chatAreaStyle'>
+          {    
+            this.props.chatContent.address === '' ?
+            (
+              <div className="chatContentPlaceholderStyle">
+                <h2>Select/Create a Chat to get started</h2>
+              </div>
+            ) :
+            this.state.contentData.length === 0 ?
+            (
+              <div className="chatContentPlaceholderStyle">
+                <CircularProgress size={100}/>
+              </div>
+            ) :
+            (
+              <List>
+                {              
+                  this.state.contentData.map((x, i) => {
+                    return (
+                      <div key={i}>
+                        <ChatContentItem                                                           
+                          data={x}                      
+                          userSettings={this.props.userSettings}
+                          rpcSettings={this.props.rpcSettings}
+                          addSenderAddress={this.props.addSenderAddress}
+                          nicknames={this.state.chatNicknames}
+                        />
+                      </div>
+                    )
+                  })
+                }
+                {              
+                  operations.map((x, i) => {
+                    return (
+                      <div key={i + this.state.contentData.length}>
+                        <ChatContentOperationItem
+                          data={x}
+                          userSettings={this.props.userSettings}
+                          rpcSettings={this.props.rpcSettings}
+                          addSenderAddress={this.props.addSenderAddress}
+                          updateOperation={this.updateOperation}                 
+                          removeOperation={this.removeOperation}
+                          nicknames={this.state.chatNicknames}
+                        />
+                      </div>
+                    )
+                  })
+                }
+                </List>
+              )
+            }          
           <div style={{ float:"left", clear: "both" }}
                 ref={(el) => { this.messagesEnd = el; }}>
           </div>
