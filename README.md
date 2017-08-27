@@ -2,6 +2,8 @@
 
 Private and Anonymous Messaging Application, built on top of the Zencash blockchain.
 
+Download the releases here: https://github.com/kendricktan/ZENChat/releases
+
 ![](http://i.imgur.com/7Dc45pR.gif)
 
 ### TODO:
