@@ -1,4 +1,4 @@
-# ZENChat
+# ZENChat ![](https://api.travis-ci.org/kendricktan/ZENChat.svg?branch=master)
 
 Private and Anonymous Messaging Application, built on top of the Zencash blockchain.
 

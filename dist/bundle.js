@@ -25801,7 +25801,7 @@ var ChatContentOperationItem = function (_Component) {
         // Add operation chat item
         this.props.updateOperation(this.props.data.opid, { opid: resp, fromAddress: fromAddress, message: message, sendData: sendData });
 
-        // Reanimte
+        // Reanimate
         this.setState({
           isComplete: false,
           failed: false,
@@ -25993,6 +25993,7 @@ var ChatContent = function (_Component3) {
 
     _this5.state = {
       contentData: [],
+      contentDataRetrieved: false,
       operations: {} // operations: { address: [ {opid: '', fromAddress: ''} ] }
     };
 
@@ -26019,12 +26020,13 @@ var ChatContent = function (_Component3) {
         var sameRPCSettings = JSON.stringify(nextProps.rpcSettings) === JSON.stringify(this.props.rpcSettings);
         var sameChatlist = JSON.stringify(nextProps.chatList) === JSON.stringify(this.props.chatList);
 
+        var sameContentDataRetrieved = nextState.contentDataRetrieved === this.state.contentDataRetrieved;
         var sameContentData = nextState.contentData.length === this.state.contentData.length;
         var sameOperations = JSON.stringify(nextState.operations) === JSON.stringify(this.state.operations);
 
         var sameNicknames = JSON.stringify(this.getChatNicknames(nextProps)) === JSON.stringify(this.getChatNicknames(this.props));
 
-        if (sameRPCSettings && sameUserSettings && sameChatlist && sameContentData && sameOperations && sameNicknames) {
+        if (sameRPCSettings && sameUserSettings && sameChatlist && sameContentData && sameOperations && sameNicknames && sameContentDataRetrieved) {
           return false;
         }
       }
@@ -26067,6 +26069,10 @@ var ChatContent = function (_Component3) {
     key: 'updateContentData',
     value: function updateContentData() {
       var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
+
+      this.setState({
+        contentDataRetrieved: false
+      });
 
       var host = props.rpcSettings.rpcHost;
       var port = props.rpcSettings.rpcPort;
@@ -26143,7 +26149,8 @@ var ChatContent = function (_Component3) {
                 return a.blockheight - b.blockheight;
               });
               this.setState({
-                contentData: receiveSorted
+                contentData: receiveSorted,
+                contentDataRetrieved: true
               }, function () {
                 return setTimeout(_this6.scrollToBottom, 250);
               });
@@ -26239,10 +26246,18 @@ var ChatContent = function (_Component3) {
               null,
               'Select/Create a Chat to get started'
             )
-          ) : this.state.contentData.length === 0 ? _react2.default.createElement(
+          ) : this.state.contentDataRetrieved === false ? _react2.default.createElement(
             'div',
             { className: 'chatContentPlaceholderStyle' },
             _react2.default.createElement(_CircularProgress2.default, { size: 100 })
+          ) : this.state.contentData.length === 0 && operations.length === 0 ? _react2.default.createElement(
+            'div',
+            { className: 'chatContentPlaceholderStyle' },
+            _react2.default.createElement(
+              'h2',
+              null,
+              'Start your chat by saying hello!'
+            )
           ) : _react2.default.createElement(
             _List.List,
             null,

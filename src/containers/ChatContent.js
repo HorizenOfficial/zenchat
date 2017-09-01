@@ -79,7 +79,7 @@ class ChatContentOperationItem extends Component {
         // Add operation chat item
         this.props.updateOperation(this.props.data.opid, {opid: resp, fromAddress: fromAddress, message: message, sendData: sendData})
 
-        // Reanimte
+        // Reanimate
         this.setState({
           isComplete: false,
           failed: false,
@@ -226,8 +226,9 @@ class ChatContent extends Component {
 
     // operations are messages that
     // are currently being sent
-    this.state = {
-      contentData: [],      
+    this.state = {      
+      contentData: [],
+      contentDataRetrieved: false,
       operations: {}, // operations: { address: [ {opid: '', fromAddress: ''} ] }
     }
 
@@ -251,12 +252,13 @@ class ChatContent extends Component {
       const sameRPCSettings = JSON.stringify(nextProps.rpcSettings) === JSON.stringify(this.props.rpcSettings)
       const sameChatlist = JSON.stringify(nextProps.chatList) === JSON.stringify(this.props.chatList)
 
+      const sameContentDataRetrieved = nextState.contentDataRetrieved === this.state.contentDataRetrieved
       const sameContentData = nextState.contentData.length === this.state.contentData.length
       const sameOperations = JSON.stringify(nextState.operations) === JSON.stringify(this.state.operations)
 
-      const sameNicknames = JSON.stringify(this.getChatNicknames(nextProps)) === JSON.stringify(this.getChatNicknames(this.props))      
+      const sameNicknames = JSON.stringify(this.getChatNicknames(nextProps)) === JSON.stringify(this.getChatNicknames(this.props))            
 
-      if (sameRPCSettings && sameUserSettings && sameChatlist && sameContentData && sameOperations && sameNicknames){        
+      if (sameRPCSettings && sameUserSettings && sameChatlist && sameContentData && sameOperations && sameNicknames && sameContentDataRetrieved){        
         return false
       }
     }
@@ -265,7 +267,7 @@ class ChatContent extends Component {
   }
 
   componentDidMount() {
-    setInterval(this.updateContentData, 30000) // Updates every 30 seconds
+    setInterval(this.updateContentData, 40000) // Updates every 40 seconds
   }
 
   componentWillReceiveProps(nextProps) {
@@ -295,6 +297,10 @@ class ChatContent extends Component {
   }
 
   updateContentData(props=this.props) {
+    this.setState({
+      contentDataRetrieved: false
+    })
+
     const host = props.rpcSettings.rpcHost
     const port = props.rpcSettings.rpcPort
     const user = props.rpcSettings.rpcUsername
@@ -370,7 +376,8 @@ class ChatContent extends Component {
           .then(function(receivedWithBlockheight){
             const receiveSorted = receivedWithBlockheight.sort((a, b) => a.blockheight - b.blockheight)            
             this.setState({
-              contentData: receiveSorted
+              contentData: receiveSorted,
+              contentDataRetrieved: true
             }, () => setTimeout(this.scrollToBottom, 250))
           }.bind(this))
         }.bind(this))      
@@ -448,10 +455,16 @@ class ChatContent extends Component {
                 <h2>Select/Create a Chat to get started</h2>
               </div>
             ) :
-            this.state.contentData.length === 0 ?
+            this.state.contentDataRetrieved === false ?
             (
               <div className="chatContentPlaceholderStyle">
                 <CircularProgress size={100}/>
+              </div>
+            ) :
+            (this.state.contentData.length) === 0 && (operations.length === 0) ?
+            (
+              <div className="chatContentPlaceholderStyle">
+                <h2>Start your chat by saying hello!</h2>
               </div>
             ) :
             (

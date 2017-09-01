@@ -56,5 +56,38 @@
     "webpack": "^2.5.1",
     "webpack-dev-server": "^2.4.5",
     "zencashjs": "^1.1.4-a"
+  },
+  "build": {
+    "appId": "io.zensystem.zenchat",
+    "category": "public.app-category.utilities",
+    "files": [
+      "builds/"
+    ],
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
+  },
+  "directories": {
+    "output": "builds"
   }
 }
