@@ -3,4 +3,5 @@ os:
   - linux
   - osx
 script:
-  yarn run package
+  - yarn run package
+  - ls
