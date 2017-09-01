@@ -1,0 +1,8 @@
+{
+  "application/javascript": {
+    "presets": [
+      "es2015",
+      "react"
+    ]
+  }
+}

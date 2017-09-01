@@ -1,1 +1,6 @@
 language: node_js
+os:
+  - linux
+  - osx
+script:
+  yarn run package
