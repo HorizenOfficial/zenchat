@@ -26036,7 +26036,7 @@ var ChatContent = function (_Component3) {
   }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
-      setInterval(this.updateContentData, 30000); // Updates every 30 seconds
+      setInterval(this.updateContentData, 40000); // Updates every 40 seconds
     }
   }, {
     key: 'componentWillReceiveProps',
