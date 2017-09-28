@@ -16,7 +16,7 @@
     "build": "webpack --config webpack.build.config.js",
     "package": "webpack --config webpack.build.config.js",
     "postpackage": "electron-packager ./ --out=./builds",
-    "packagedeb": "yarn run package && electron-installer-debian --src ./builds/ZENChat-linux-x64 --dest ./builds/installers/ --arch amd64",
+    "packagedeb": "yarn run package && electron-installer-debian --src ./builds/ZENChat-linux-x64 --dest ./builds/installers/ --arch amd64 --options.name zenchat",
     "test": "echo 'need to do this'"
   },
   "devDependencies": {
