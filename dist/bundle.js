@@ -25464,13 +25464,20 @@ var ChatSender = function (_Component) {
         // Set the signed message
         obj.zenmsg.sign = signed;
 
-        // Convert to hex
-        var memo = (0, _messaging.stringToHex)(JSON.stringify(obj));
-        var sendData = [{ address: destinationAddress, amount: 0.00000001, memo: memo }];
-        (0, _rpc2.default)(host, port, user, pass, 10000).cmd('z_sendmany', fromAddress, sendData, 1, 0, function (err, resp, header) {
+        // Get remaining balance
+        // and redirect back to wallet
+        (0, _rpc2.default)(host, port, user, pass, 10000).cmd('z_getbalance', fromAddress, function (err, addrBalance, headers) {
+          // Get remaining balance and redirect to original address
+          var remainingBalance = parseFloat(addrBalance) - 0.00000001;
 
-          // Add operation chat item
-          this.props.addOperation({ opid: resp, fromAddress: fromAddress, message: msg, sendData: sendData });
+          // Convert to hex
+          var memo = (0, _messaging.stringToHex)(JSON.stringify(obj));
+          var sendData = [{ address: destinationAddress, amount: 0.00000001, memo: memo }, { address: fromAddress, amount: remainingBalance }];
+
+          (0, _rpc2.default)(host, port, user, pass, 10000).cmd('z_sendmany', fromAddress, sendData, 1, 0, function (err, resp, header) {
+            // Add operation chat item
+            this.props.addOperation({ opid: resp, fromAddress: fromAddress, message: msg, sendData: sendData });
+          }.bind(this));
         }.bind(this));
       }.bind(this));
 

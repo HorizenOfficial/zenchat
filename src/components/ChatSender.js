@@ -45,16 +45,23 @@ export default class ChatSender extends Component {
       // Set the signed message
       obj.zenmsg.sign = signed
 
-      // Convert to hex
-      const memo = stringToHex(JSON.stringify(obj))
-      const sendData = [{address: destinationAddress, amount: 0.00000001, memo: memo}]
-      rpcCall(host, port, user, pass, 10000)
-        .cmd('z_sendmany', fromAddress, sendData, 1, 0, function(err, resp, header){
-          
-          // Add operation chat item
-          this.props.addOperation({opid: resp, fromAddress: fromAddress, message: msg, sendData: sendData})
-        
-      }.bind(this))
+      // Get remaining balance
+      // and redirect back to wallet
+      rpcCall(host, port, user, pass, 10000).cmd('z_getbalance', fromAddress, function(err, addrBalance, headers){        
+        // Get remaining balance and redirect to original address
+        // Fucking javascript and their floats        
+        const remainingBalance = (((parseFloat(addrBalance) * 100000000) - 1) / 100000000).toPrecision(9)        
+
+        // Convert to hex
+        const memo = stringToHex(JSON.stringify(obj))
+        const sendData = [{address: destinationAddress, amount: 0.00000001, memo: memo}, {address: fromAddress, amount: remainingBalance}]
+
+        rpcCall(host, port, user, pass, 10000)
+          .cmd('z_sendmany', fromAddress, sendData, 1, 0, function(err, resp, header){            
+            // Add operation chat item
+            this.props.addOperation({opid: resp, fromAddress: fromAddress, message: msg, sendData: sendData})
+        }.bind(this))
+      }.bind(this))      
     }.bind(this))
 
     // Set textbox to none
