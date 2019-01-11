@@ -49,7 +49,6 @@ export default class ChatSender extends Component {
       // and redirect back to wallet
       rpcCall(host, port, user, pass, 10000).cmd('z_getbalance', fromAddress, function(err, addrBalance, headers){        
         // Get remaining balance and redirect to original address
-        // Fucking javascript and their floats        
         const remainingBalance = (((parseFloat(addrBalance) * 100000000) - 1) / 100000000).toPrecision(9)        
 
         // Convert to hex
