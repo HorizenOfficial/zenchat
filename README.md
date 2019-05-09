@@ -1,4 +1,6 @@
-# ZENChat ![](https://api.travis-ci.org/kendricktan/ZENChat.svg?branch=master)
+# DEPRECATED
+# ZenChat has been integrated int Sphere By Horizen https://github.com/ZencashOfficial/Sphere_by_Horizen/releases
+# As such ZenChat is no longer maintained
 
 Private and Anonymous Messaging Application, built on top of the Zencash blockchain.
 
